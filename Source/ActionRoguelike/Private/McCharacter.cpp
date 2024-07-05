@@ -31,6 +31,26 @@ void AMcCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
+// Called every frame
+void AMcCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+// Called to bind functionality to input
+void AMcCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis("MoveForward", this, &AMcCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &AMcCharacter::MoveRight);
+
+	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+
+	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &AMcCharacter::PrimaryAttack);
+}
+
 void AMcCharacter::MoveForward(float Value)
 {
 	FRotator ControlRot = GetControlRotation();
@@ -54,19 +74,14 @@ void AMcCharacter::MoveRight(float Value)
 	AddMovementInput(RightVector, Value);
 }
 
-// Called every frame
-void AMcCharacter::Tick(float DeltaTime)
+void AMcCharacter::PrimaryAttack()
 {
-	Super::Tick(DeltaTime);
-}
+	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
-// Called to bind functionality to input
-void AMcCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &AMcCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AMcCharacter::MoveRight);
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }
