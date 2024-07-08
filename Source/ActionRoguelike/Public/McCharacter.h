@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "McCharacter.generated.h"
 
+class UMcInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
@@ -29,12 +30,16 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
 
+	UPROPERTY(VisibleAnywhere)
+	UMcInteractionComponent* InteractionComp;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void PrimaryAttack();
+	void PrimaryInteract();
 
 public:
 	// Called every frame
