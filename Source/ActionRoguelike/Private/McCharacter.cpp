@@ -82,6 +82,16 @@ void AMcCharacter::MoveRight(float Value)
 
 void AMcCharacter::PrimaryAttack()
 {
+	PlayAnimMontage(AttackAnim);
+
+	constexpr float TimerDelay = 0.2f;
+
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &AMcCharacter::PrimaryAttack_TimerCallback,
+	                                TimerDelay);
+}
+
+void AMcCharacter::PrimaryAttack_TimerCallback()
+{
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 
 	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
