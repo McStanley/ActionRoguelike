@@ -32,6 +32,8 @@ protected:
 	             FVector NormalImpulse,
 	             const FHitResult& Hit);
 
+	virtual void PostInitializeComponents() override;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

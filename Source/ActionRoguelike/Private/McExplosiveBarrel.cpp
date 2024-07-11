@@ -23,12 +23,17 @@ AMcExplosiveBarrel::AMcExplosiveBarrel()
 	RadialForceComp->SetupAttachment(RootComponent);
 }
 
+void AMcExplosiveBarrel::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	StaticMeshComp->OnComponentHit.AddDynamic(this, &AMcExplosiveBarrel::Explode);
+}
+
 // Called when the game starts or when spawned
 void AMcExplosiveBarrel::BeginPlay()
 {
 	Super::BeginPlay();
-
-	StaticMeshComp->OnComponentHit.AddDynamic(this, &AMcExplosiveBarrel::Explode);
 }
 
 // Called every frame
