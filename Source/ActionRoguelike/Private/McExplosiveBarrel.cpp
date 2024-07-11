@@ -49,4 +49,10 @@ void AMcExplosiveBarrel::Explode(UPrimitiveComponent* HitComponent,
                                  const FHitResult& Hit)
 {
 	RadialForceComp->FireImpulse();
+
+	UE_LOG(LogTemp, Log, TEXT("Explosion (Explosive Barrel C++)"));
+	UE_LOG(LogTemp, Warning, TEXT("OtherActor: %s at game time %f"), *GetNameSafe(OtherActor), GetWorld()->TimeSeconds);
+
+	const FString DebugString = FString::Printf(TEXT("Hit at location: %s"), *Hit.ImpactPoint.ToString());
+	DrawDebugString(GetWorld(), Hit.ImpactPoint, DebugString, nullptr, FColor::Green, 2.f, true);
 }
