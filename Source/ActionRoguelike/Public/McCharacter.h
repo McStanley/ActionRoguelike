@@ -48,6 +48,8 @@ protected:
 	void PrimaryAttack_TimerCallback();
 	void PrimaryInteract();
 
+	FTransform GetProjectileSpawnTM();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

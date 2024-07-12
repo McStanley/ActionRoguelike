@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMcCharacter::AMcCharacter()
@@ -92,9 +93,7 @@ void AMcCharacter::PrimaryAttack()
 
 void AMcCharacter::PrimaryAttack_TimerCallback()
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-
-	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+	const FTransform SpawnTM = GetProjectileSpawnTM();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -106,4 +105,34 @@ void AMcCharacter::PrimaryAttack_TimerCallback()
 void AMcCharacter::PrimaryInteract()
 {
 	InteractionComp->PrimaryInteract();
+}
+
+FTransform AMcCharacter::GetProjectileSpawnTM()
+{
+	FRotator ControlRotation = this->GetControlRotation();
+	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	FVector CameraLocation = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraLocation();
+
+	FVector TraceEnd = CameraLocation + (ControlRotation.Vector() * 10000);
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Destructible);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_PhysicsBody);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+
+	FHitResult Hit;
+
+	bool bHitFound = GetWorld()->LineTraceSingleByObjectType(Hit, CameraLocation, TraceEnd, ObjectQueryParams);
+
+	FVector Target = bHitFound ? Hit.Location : TraceEnd;
+	// DrawDebugString(GetWorld(), Target, "Target here", nullptr, FColor::Blue, 5.f, true);
+
+	FVector ProjectilePath = Target - HandLocation;
+	FRotator ProjectileRotation = ProjectilePath.Rotation();
+
+	FTransform SpawnTM = FTransform(ProjectileRotation, HandLocation);
+
+	return SpawnTM;
 }
