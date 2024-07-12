@@ -4,6 +4,7 @@
 #include "McInteractionComponent.h"
 
 #include "McGameplayInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UMcInteractionComponent::UMcInteractionComponent()
@@ -45,7 +46,10 @@ void UMcInteractionComponent::PrimaryInteract()
 	AActor* Owner = GetOwner();
 	Owner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
-	FVector End = EyeLocation + (EyeRotation.Vector() * 1000);
+	FVector CameraLocation = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraLocation();
+	// DrawDebugString(GetWorld(), CameraLocation, "Camera here", nullptr, FColor::Blue, 5.f, true);
+
+	FVector End = CameraLocation + (EyeRotation.Vector() * 1000);
 
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
@@ -55,11 +59,13 @@ void UMcInteractionComponent::PrimaryInteract()
 	FCollisionShape Shape;
 	Shape.SetSphere(Radius);
 
-	bool bHitFound = GetWorld()->SweepMultiByObjectType(Hits, EyeLocation, End, FQuat::Identity, ObjectQueryParams,
-	                                                    Shape);
+	const bool bHitFound = GetWorld()->SweepMultiByObjectType(Hits, CameraLocation, End, FQuat::Identity,
+	                                                          ObjectQueryParams, Shape);
 
 	const FColor DebugColor = bHitFound ? FColor::Green : FColor::Red;
 	constexpr float DebugLifeTime = 2.0f;
+
+	bool bInteractExecuted = false;
 
 	for (FHitResult Hit : Hits)
 	{
@@ -71,9 +77,15 @@ void UMcInteractionComponent::PrimaryInteract()
 		{
 			IMcGameplayInterface::Execute_Interact(HitActor, Cast<APawn>(Owner));
 
+			DrawDebugLine(GetWorld(), EyeLocation, Hit.Location, DebugColor, false, DebugLifeTime, 0, 2.0f);
+
+			bInteractExecuted = true;
 			break;
 		}
 	}
 
-	DrawDebugLine(GetWorld(), EyeLocation, End, DebugColor, false, DebugLifeTime, 0, 2.0f);
+	if (!bInteractExecuted)
+	{
+		DrawDebugLine(GetWorld(), EyeLocation, End, DebugColor, false, DebugLifeTime, 0, 2.0f);
+	}
 }
