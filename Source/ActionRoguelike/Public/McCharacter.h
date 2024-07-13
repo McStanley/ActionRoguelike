@@ -23,6 +23,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Projectiles")
 	UAnimMontage* MagicProjectileAnim;
 
+	UPROPERTY(EditAnywhere, Category = "Projectiles")
+	TSubclassOf<AActor> BlackHoleClass;
+
+	UPROPERTY(EditAnywhere, Category = "Projectiles")
+	UAnimMontage* BlackHoleAnim;
+
 	FTimerHandle TimerHandle_Projectile;
 	FTimerDelegate TimerDelegate_Projectile;
 
@@ -46,6 +52,7 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void PrimaryAttack();
+	void SecondaryAttack();
 	void PrimaryInteract();
 
 	void UseProjectile(UAnimMontage* AnimMontage, const float TimerDelay, TSubclassOf<AActor>& Class);

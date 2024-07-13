@@ -55,6 +55,8 @@ void AMcCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &AMcCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &AMcCharacter::SecondaryAttack);
+
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &AMcCharacter::PrimaryInteract);
 }
 
@@ -84,6 +86,11 @@ void AMcCharacter::MoveRight(float Value)
 void AMcCharacter::PrimaryAttack()
 {
 	UseProjectile(MagicProjectileAnim, 0.2f, MagicProjectileClass);
+}
+
+void AMcCharacter::SecondaryAttack()
+{
+	UseProjectile(BlackHoleAnim, 0.15f, BlackHoleClass);
 }
 
 void AMcCharacter::PrimaryInteract()
