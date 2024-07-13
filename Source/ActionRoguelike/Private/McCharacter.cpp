@@ -83,23 +83,7 @@ void AMcCharacter::MoveRight(float Value)
 
 void AMcCharacter::PrimaryAttack()
 {
-	PlayAnimMontage(AttackAnim);
-
-	constexpr float TimerDelay = 0.2f;
-
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &AMcCharacter::PrimaryAttack_TimerCallback,
-	                                TimerDelay);
-}
-
-void AMcCharacter::PrimaryAttack_TimerCallback()
-{
-	const FTransform SpawnTM = GetProjectileSpawnTM();
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+	UseProjectile(MagicProjectileAnim, 0.2f, MagicProjectileClass);
 }
 
 void AMcCharacter::PrimaryInteract()
@@ -107,7 +91,27 @@ void AMcCharacter::PrimaryInteract()
 	InteractionComp->PrimaryInteract();
 }
 
-FTransform AMcCharacter::GetProjectileSpawnTM()
+void AMcCharacter::UseProjectile(UAnimMontage* AnimMontage, const float TimerDelay, TSubclassOf<AActor>& Class)
+{
+	PlayAnimMontage(AnimMontage);
+
+	TimerDelegate_Projectile.BindUFunction(this, FName("UseProjectile_TimerCallback"), Class);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_Projectile, TimerDelegate_Projectile, TimerDelay, false);
+}
+
+void AMcCharacter::UseProjectile_TimerCallback(const TSubclassOf<AActor>& Class)
+{
+	const FTransform SpawnTM = GetProjectileSpawnTM();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = this;
+
+	GetWorld()->SpawnActor<AActor>(Class, SpawnTM, SpawnParams);
+}
+
+FTransform AMcCharacter::GetProjectileSpawnTM() const
 {
 	FRotator ControlRotation = this->GetControlRotation();
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");

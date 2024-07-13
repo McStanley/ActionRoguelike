@@ -17,13 +17,14 @@ class ACTIONROGUELIKE_API AMcCharacter : public ACharacter
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> ProjectileClass;
+	UPROPERTY(EditAnywhere, Category = "Projectiles")
+	TSubclassOf<AActor> MagicProjectileClass;
 
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	UAnimMontage* AttackAnim;
+	UPROPERTY(EditAnywhere, Category = "Projectiles")
+	UAnimMontage* MagicProjectileAnim;
 
-	FTimerHandle TimerHandle_PrimaryAttack;
+	FTimerHandle TimerHandle_Projectile;
+	FTimerDelegate TimerDelegate_Projectile;
 
 public:
 	// Sets default values for this character's properties
@@ -45,10 +46,14 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void PrimaryAttack();
-	void PrimaryAttack_TimerCallback();
 	void PrimaryInteract();
 
-	FTransform GetProjectileSpawnTM();
+	void UseProjectile(UAnimMontage* AnimMontage, const float TimerDelay, TSubclassOf<AActor>& Class);
+
+	UFUNCTION()
+	void UseProjectile_TimerCallback(const TSubclassOf<AActor>& Class);
+
+	FTransform GetProjectileSpawnTM() const;
 
 public:
 	// Called every frame
