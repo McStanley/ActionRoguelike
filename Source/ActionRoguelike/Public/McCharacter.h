@@ -29,6 +29,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Projectiles")
 	UAnimMontage* BlackHoleAnim;
 
+	UPROPERTY(EditAnywhere, Category = "Projectiles")
+	TSubclassOf<AActor> TeleportClass;
+
+	UPROPERTY(EditAnywhere, Category = "Projectiles")
+	UAnimMontage* TeleportAnim;
+
 	FTimerHandle TimerHandle_Projectile;
 	FTimerDelegate TimerDelegate_Projectile;
 
@@ -51,16 +57,21 @@ protected:
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+	void Teleport();
 	void PrimaryAttack();
 	void SecondaryAttack();
 	void PrimaryInteract();
 
-	void UseProjectile(UAnimMontage* AnimMontage, const float TimerDelay, TSubclassOf<AActor>& Class);
+	void UseProjectile(UAnimMontage* AnimMontage,
+	                   const float TimerDelay,
+	                   TSubclassOf<AActor>& Class,
+	                   FName Socket,
+	                   float MaxDistance = 10000.f);
 
 	UFUNCTION()
-	void UseProjectile_TimerCallback(const TSubclassOf<AActor>& Class);
+	void UseProjectile_TimerCallback(const TSubclassOf<AActor>& Class, FName Socket, float MaxDistance);
 
-	FTransform GetProjectileSpawnTM() const;
+	FTransform GetProjectileSpawnTM(const FName Socket, float MaxDistance) const;
 
 public:
 	// Called every frame

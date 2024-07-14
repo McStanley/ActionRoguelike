@@ -53,6 +53,7 @@ void AMcCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &AMcCharacter::Teleport);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &AMcCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &AMcCharacter::SecondaryAttack);
@@ -83,14 +84,19 @@ void AMcCharacter::MoveRight(float Value)
 	AddMovementInput(RightVector, Value);
 }
 
+void AMcCharacter::Teleport()
+{
+	UseProjectile(TeleportAnim, 0.2f, TeleportClass, "Muzzle_02", 1000.f);
+}
+
 void AMcCharacter::PrimaryAttack()
 {
-	UseProjectile(MagicProjectileAnim, 0.2f, MagicProjectileClass);
+	UseProjectile(MagicProjectileAnim, 0.2f, MagicProjectileClass, "Muzzle_01");
 }
 
 void AMcCharacter::SecondaryAttack()
 {
-	UseProjectile(BlackHoleAnim, 0.15f, BlackHoleClass);
+	UseProjectile(BlackHoleAnim, 0.15f, BlackHoleClass, "Muzzle_01");
 }
 
 void AMcCharacter::PrimaryInteract()
@@ -98,18 +104,22 @@ void AMcCharacter::PrimaryInteract()
 	InteractionComp->PrimaryInteract();
 }
 
-void AMcCharacter::UseProjectile(UAnimMontage* AnimMontage, const float TimerDelay, TSubclassOf<AActor>& Class)
+void AMcCharacter::UseProjectile(UAnimMontage* AnimMontage,
+                                 const float TimerDelay,
+                                 TSubclassOf<AActor>& Class,
+                                 FName Socket,
+                                 float MaxDistance)
 {
 	PlayAnimMontage(AnimMontage);
 
-	TimerDelegate_Projectile.BindUFunction(this, FName("UseProjectile_TimerCallback"), Class);
+	TimerDelegate_Projectile.BindUFunction(this, FName("UseProjectile_TimerCallback"), Class, Socket, MaxDistance);
 
 	GetWorldTimerManager().SetTimer(TimerHandle_Projectile, TimerDelegate_Projectile, TimerDelay, false);
 }
 
-void AMcCharacter::UseProjectile_TimerCallback(const TSubclassOf<AActor>& Class)
+void AMcCharacter::UseProjectile_TimerCallback(const TSubclassOf<AActor>& Class, FName Socket, float MaxDistance)
 {
-	const FTransform SpawnTM = GetProjectileSpawnTM();
+	const FTransform SpawnTM = GetProjectileSpawnTM(Socket, MaxDistance);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -118,13 +128,13 @@ void AMcCharacter::UseProjectile_TimerCallback(const TSubclassOf<AActor>& Class)
 	GetWorld()->SpawnActor<AActor>(Class, SpawnTM, SpawnParams);
 }
 
-FTransform AMcCharacter::GetProjectileSpawnTM() const
+FTransform AMcCharacter::GetProjectileSpawnTM(const FName Socket, float MaxDistance) const
 {
 	FRotator ControlRotation = this->GetControlRotation();
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	FVector HandLocation = GetMesh()->GetSocketLocation(Socket);
 	FVector CameraLocation = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraLocation();
 
-	FVector TraceEnd = CameraLocation + (ControlRotation.Vector() * 10000);
+	FVector TraceEnd = CameraLocation + (ControlRotation.Vector() * MaxDistance);
 
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
