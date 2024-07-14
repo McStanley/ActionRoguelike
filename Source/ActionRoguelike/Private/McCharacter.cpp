@@ -110,11 +110,14 @@ void AMcCharacter::UseProjectile(UAnimMontage* AnimMontage,
                                  FName Socket,
                                  float MaxDistance)
 {
-	PlayAnimMontage(AnimMontage);
+	if (ensureAlways(AnimMontage && Class))
+	{
+		PlayAnimMontage(AnimMontage);
 
-	TimerDelegate_Projectile.BindUFunction(this, FName("UseProjectile_TimerCallback"), Class, Socket, MaxDistance);
+		TimerDelegate_Projectile.BindUFunction(this, FName("UseProjectile_TimerCallback"), Class, Socket, MaxDistance);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_Projectile, TimerDelegate_Projectile, TimerDelay, false);
+		GetWorldTimerManager().SetTimer(TimerHandle_Projectile, TimerDelegate_Projectile, TimerDelay, false);
+	}
 }
 
 void AMcCharacter::UseProjectile_TimerCallback(const TSubclassOf<AActor>& Class, FName Socket, float MaxDistance)
