@@ -13,5 +13,7 @@ bool UMcAttributeComponent::ApplyHealthChange(const float Delta)
 {
 	Health += Delta;
 
+	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
+
 	return true;
 }
