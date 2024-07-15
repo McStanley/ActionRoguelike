@@ -3,6 +3,7 @@
 
 #include "McCharacter.h"
 
+#include "McAttributeComponent.h"
 #include "McInteractionComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -21,6 +22,8 @@ AMcCharacter::AMcCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	AttributeComp = CreateDefaultSubobject<UMcAttributeComponent>("AttributeComp");
 
 	InteractionComp = CreateDefaultSubobject<UMcInteractionComponent>("InteractionComp");
 

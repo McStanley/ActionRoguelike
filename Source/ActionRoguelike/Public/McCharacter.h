@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "McCharacter.generated.h"
 
+class UMcAttributeComponent;
 class UMcInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -48,6 +49,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UMcAttributeComponent* AttributeComp;
 
 	UPROPERTY(VisibleAnywhere)
 	UMcInteractionComponent* InteractionComp;
