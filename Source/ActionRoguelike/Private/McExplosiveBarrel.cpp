@@ -14,6 +14,7 @@ AMcExplosiveBarrel::AMcExplosiveBarrel()
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
 	StaticMeshComp->SetSimulatePhysics(true);
 	StaticMeshComp->SetCollisionProfileName("PhysicsActor");
+	StaticMeshComp->CanCharacterStepUpOn = ECB_No;
 	RootComponent = StaticMeshComp;
 
 	RadialForceComp = CreateDefaultSubobject<URadialForceComponent>("RadialForceComp");
