@@ -6,6 +6,7 @@
 #include "McAttributeComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMcMagicProjectile::AMcMagicProjectile()
@@ -31,9 +32,15 @@ void AMcMagicProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponen
 		if (AttributeComp != nullptr)
 		{
 			AttributeComp->ApplyHealthChange(-20.f);
-
-			this->Destroy();
 		}
+
+		if (ensure(EmitterTemplate))
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, GetActorLocation(),
+			                                         GetActorRotation());
+		}
+
+		Destroy();
 	}
 }
 
