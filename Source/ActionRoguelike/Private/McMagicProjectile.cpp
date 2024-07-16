@@ -22,7 +22,7 @@ void AMcMagicProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponen
                                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                          const FHitResult& SweepResult)
 {
-	if (OtherActor != nullptr)
+	if (OtherActor && OtherActor != GetInstigator())
 	{
 		UMcAttributeComponent* AttributeComp = Cast<UMcAttributeComponent>(
 			OtherActor->GetComponentByClass(UMcAttributeComponent::StaticClass())
