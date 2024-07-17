@@ -32,6 +32,13 @@ AMcCharacter::AMcCharacter()
 	bUseControllerRotationYaw = false;
 }
 
+void AMcCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComp->OnHealthChanged.AddDynamic(this, &AMcCharacter::OnHealthChanged);
+}
+
 // Called when the game starts or when spawned
 void AMcCharacter::BeginPlay()
 {
@@ -162,4 +169,15 @@ FTransform AMcCharacter::GetProjectileSpawnTM(const FName Socket, float MaxDista
 	FTransform SpawnTM = FTransform(ProjectileRotation, HandLocation);
 
 	return SpawnTM;
+}
+
+void AMcCharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth,
+                                   float Delta)
+{
+	if (NewHealth <= 0.f && Delta < 0.f)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+
+		DisableInput(PC);
+	}
 }

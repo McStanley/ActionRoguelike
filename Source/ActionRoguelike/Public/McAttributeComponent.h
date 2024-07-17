@@ -24,6 +24,9 @@ protected:
 	float Health;
 
 public:
+	UFUNCTION(BlueprintCallable)
+	bool IsALive() const;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
 

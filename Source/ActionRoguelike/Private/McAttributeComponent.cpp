@@ -9,6 +9,11 @@ UMcAttributeComponent::UMcAttributeComponent()
 	Health = 100;
 }
 
+bool UMcAttributeComponent::IsALive() const
+{
+	return Health > 0.f;
+}
+
 bool UMcAttributeComponent::ApplyHealthChange(const float Delta)
 {
 	Health += Delta;

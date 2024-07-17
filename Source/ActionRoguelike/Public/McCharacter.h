@@ -56,6 +56,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UMcInteractionComponent* InteractionComp;
 
+	virtual void PostInitializeComponents() override;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -76,6 +78,9 @@ protected:
 	void UseProjectile_TimerCallback(const TSubclassOf<AActor>& Class, FName Socket, float MaxDistance);
 
 	FTransform GetProjectileSpawnTM(const FName Socket, float MaxDistance) const;
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth, float Delta);
 
 public:
 	// Called every frame
