@@ -7,6 +7,7 @@
 UMcAttributeComponent::UMcAttributeComponent()
 {
 	Health = 100;
+	HealthMax = 100;
 }
 
 bool UMcAttributeComponent::IsALive() const
@@ -16,7 +17,8 @@ bool UMcAttributeComponent::IsALive() const
 
 bool UMcAttributeComponent::ApplyHealthChange(const float Delta)
 {
-	Health += Delta;
+	const float NewHealth = Health + Delta;
+	Health = FMath::Clamp(NewHealth, 0, HealthMax);
 
 	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
 
