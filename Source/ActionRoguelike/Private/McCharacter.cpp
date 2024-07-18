@@ -174,10 +174,15 @@ FTransform AMcCharacter::GetProjectileSpawnTM(const FName Socket, float MaxDista
 void AMcCharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth,
                                    float Delta)
 {
-	if (NewHealth <= 0.f && Delta < 0.f)
+	if (Delta < 0.f)
 	{
-		APlayerController* PC = Cast<APlayerController>(GetController());
+		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->GetTimeSeconds());
 
-		DisableInput(PC);
+		if (NewHealth <= 0.f)
+		{
+			APlayerController* PC = Cast<APlayerController>(GetController());
+
+			DisableInput(PC);
+		}
 	}
 }
