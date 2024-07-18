@@ -16,6 +16,15 @@ public:
 	AMcMagicProjectile();
 
 protected:
+	UPROPERTY(VisibleAnywhere)
+	UAudioComponent* AudioComp;
+
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* LoopSound;
+
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* ImpactSound;
+
 	UPROPERTY(EditAnywhere, Category = "Explosion")
 	UParticleSystem* EmitterTemplate;
 
@@ -23,10 +32,13 @@ protected:
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	                     int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UFUNCTION()
+	void OnSphereHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	                 FVector NormalImpulse, const FHitResult& Hit);
 
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void Explode();
+
+	virtual void PostInitializeComponents() override;
+
+	virtual void BeginPlay() override;
 };
