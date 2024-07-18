@@ -27,7 +27,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsALive() const;
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, Transient)
 	FOnHealthChanged OnHealthChanged;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
