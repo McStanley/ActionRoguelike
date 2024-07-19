@@ -30,9 +30,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsALive() const;
 
+	UFUNCTION(BlueprintCallable)
+	bool HasFullHealth() const;
+
 	UPROPERTY(BlueprintAssignable, Transient)
 	FOnHealthChanged OnHealthChanged;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(const float Delta);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool SetHealthToMax();
 };
