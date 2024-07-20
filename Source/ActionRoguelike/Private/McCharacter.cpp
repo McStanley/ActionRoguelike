@@ -122,6 +122,11 @@ void AMcCharacter::UseProjectile(UAnimMontage* AnimMontage,
 {
 	if (ensureAlways(AnimMontage && Class))
 	{
+		if (ensure(CastingEffect))
+		{
+			UGameplayStatics::SpawnEmitterAttached(CastingEffect, GetMesh(), Socket);
+		}
+
 		PlayAnimMontage(AnimMontage);
 
 		TimerDelegate_Projectile.BindUFunction(this, FName("UseProjectile_TimerCallback"), Class, Socket, MaxDistance);

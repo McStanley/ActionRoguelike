@@ -19,6 +19,9 @@ class ACTIONROGUELIKE_API AMcCharacter : public ACharacter
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Projectiles")
+	UParticleSystem* CastingEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Projectiles")
 	TSubclassOf<AActor> MagicProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "Projectiles")
