@@ -80,5 +80,10 @@ void AMcMagicProjectile::Explode()
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation(), GetActorRotation());
 	}
 
+	if (ensure(CameraShake))
+	{
+		UGameplayStatics::PlayWorldCameraShake(GetWorld(), CameraShake, GetActorLocation(), 0, 2000.f);
+	}
+
 	Destroy();
 }

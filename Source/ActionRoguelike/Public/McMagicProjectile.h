@@ -28,6 +28,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Explosion")
 	UParticleSystem* EmitterTemplate;
 
+	UPROPERTY(EditAnywhere, Category = "Explosion")
+	TSubclassOf<UCameraShakeBase> CameraShake;
+
 	UFUNCTION()
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	                     int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
