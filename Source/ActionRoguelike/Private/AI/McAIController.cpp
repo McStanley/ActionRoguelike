@@ -7,5 +7,8 @@ void AMcAIController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	RunBehaviorTree(BehaviorTree);
+	if (ensureMsgf(BehaviorTree, TEXT("BehaviorTree is nullptr. Assign BahaviorTree in your AI Controller.")))
+	{
+		RunBehaviorTree(BehaviorTree);
+	}
 }
