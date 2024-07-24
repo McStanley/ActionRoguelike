@@ -4,12 +4,14 @@
 #include "AI/McAICharacter.h"
 
 #include "AIController.h"
+#include "McAttributeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Perception/PawnSensingComponent.h"
 
 // Sets default values
 AMcAICharacter::AMcAICharacter()
 {
+	AttributeComp = CreateDefaultSubobject<UMcAttributeComponent>("AttributeComp");
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 }
 

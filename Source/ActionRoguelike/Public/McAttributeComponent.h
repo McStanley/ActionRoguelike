@@ -31,6 +31,12 @@ public:
 	bool IsALive() const;
 
 	UFUNCTION(BlueprintCallable)
+	float GetHealth() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetHealthPercent() const;
+
+	UFUNCTION(BlueprintCallable)
 	bool HasFullHealth() const;
 
 	UPROPERTY(BlueprintAssignable, Transient)

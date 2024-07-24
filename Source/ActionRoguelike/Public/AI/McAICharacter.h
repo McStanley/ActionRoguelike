@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "McAICharacter.generated.h"
 
+class UMcAttributeComponent;
 class UPawnSensingComponent;
 
 UCLASS()
@@ -18,6 +19,9 @@ public:
 	AMcAICharacter();
 
 protected:
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UMcAttributeComponent* AttributeComp;
+
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
 

@@ -15,6 +15,16 @@ bool UMcAttributeComponent::IsALive() const
 	return Health > 0.f;
 }
 
+float UMcAttributeComponent::GetHealth() const
+{
+	return Health;
+}
+
+float UMcAttributeComponent::GetHealthPercent() const
+{
+	return Health / HealthMax;
+}
+
 bool UMcAttributeComponent::HasFullHealth() const
 {
 	return Health == HealthMax;
