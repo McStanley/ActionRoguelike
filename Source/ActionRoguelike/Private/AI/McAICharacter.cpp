@@ -13,6 +13,8 @@ AMcAICharacter::AMcAICharacter()
 {
 	AttributeComp = CreateDefaultSubobject<UMcAttributeComponent>("AttributeComp");
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void AMcAICharacter::PostInitializeComponents()
