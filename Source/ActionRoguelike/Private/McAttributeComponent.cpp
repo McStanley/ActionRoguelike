@@ -32,12 +32,16 @@ bool UMcAttributeComponent::HasFullHealth() const
 
 bool UMcAttributeComponent::ApplyHealthChange(const float Delta)
 {
+	const float OldHealth = Health;
+
 	const float NewHealth = Health + Delta;
 	Health = FMath::Clamp(NewHealth, 0, HealthMax);
 
-	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
+	const float ActualDelta = Health - OldHealth;
 
-	return true;
+	OnHealthChanged.Broadcast(nullptr, this, Health, ActualDelta);
+
+	return ActualDelta != 0;
 }
 
 bool UMcAttributeComponent::SetHealthToMax()
