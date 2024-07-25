@@ -14,9 +14,7 @@ void AMcHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
 	// DrawDebugString(GetWorld(), GetActorLocation(), "Interact");
 
-	UMcAttributeComponent* AttributeComp = Cast<UMcAttributeComponent>(
-		InstigatorPawn->GetComponentByClass(UMcAttributeComponent::StaticClass())
-	);
+	UMcAttributeComponent* AttributeComp = UMcAttributeComponent::GetAttributeComponent(InstigatorPawn);
 
 	if (AttributeComp != nullptr)
 	{

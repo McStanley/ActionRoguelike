@@ -29,9 +29,7 @@ void AMcGameModeBase::OnSpawnTimerElapsed()
 	{
 		AMcAICharacter* Bot = *It;
 
-		UMcAttributeComponent* AttributeComp = Cast<UMcAttributeComponent>(
-			Bot->GetComponentByClass(UMcAttributeComponent::StaticClass())
-		);
+		UMcAttributeComponent* AttributeComp = UMcAttributeComponent::GetAttributeComponent(Bot);
 
 		if (ensure(AttributeComp) && AttributeComp->IsALive())
 		{

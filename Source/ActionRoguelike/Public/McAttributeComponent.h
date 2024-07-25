@@ -16,6 +16,12 @@ class ACTIONROGUELIKE_API UMcAttributeComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	static UMcAttributeComponent* GetAttributeComponent(AActor* FromActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes", meta = (DisplayName = "IsAlive"))
+	static bool IsActorAlive(AActor* Actor);
+
 	// Sets default values for this component's properties
 	UMcAttributeComponent();
 

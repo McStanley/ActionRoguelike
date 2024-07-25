@@ -48,9 +48,7 @@ void AMcMagicProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponen
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		UMcAttributeComponent* AttributeComp = Cast<UMcAttributeComponent>(
-			OtherActor->GetComponentByClass(UMcAttributeComponent::StaticClass())
-		);
+		UMcAttributeComponent* AttributeComp = UMcAttributeComponent::GetAttributeComponent(OtherActor);
 
 		if (AttributeComp != nullptr)
 		{

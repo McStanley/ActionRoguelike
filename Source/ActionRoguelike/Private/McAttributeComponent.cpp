@@ -3,6 +3,27 @@
 
 #include "McAttributeComponent.h"
 
+UMcAttributeComponent* UMcAttributeComponent::GetAttributeComponent(AActor* FromActor)
+{
+	if (FromActor == nullptr)
+	{
+		return nullptr;
+	}
+
+	return FromActor->FindComponentByClass<UMcAttributeComponent>();
+}
+
+bool UMcAttributeComponent::IsActorAlive(AActor* Actor)
+{
+	UMcAttributeComponent* AttributeComp = GetAttributeComponent(Actor);
+	if (AttributeComp == nullptr)
+	{
+		return false;
+	}
+
+	return AttributeComp->IsALive();
+}
+
 // Sets default values for this component's properties
 UMcAttributeComponent::UMcAttributeComponent()
 {
