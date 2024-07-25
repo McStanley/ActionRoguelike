@@ -54,7 +54,7 @@ void AMcMagicProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponen
 
 		if (AttributeComp != nullptr)
 		{
-			AttributeComp->ApplyHealthChange(-DamageAmount);
+			AttributeComp->ApplyHealthChange(GetInstigator(), -DamageAmount);
 		}
 
 		Explode();

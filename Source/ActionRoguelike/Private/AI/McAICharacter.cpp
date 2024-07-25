@@ -28,15 +28,9 @@ void AMcAICharacter::PostInitializeComponents()
 
 void AMcAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	AAIController* AIController = Cast<AAIController>(GetController());
-	if (AIController)
-	{
-		UBlackboardComponent* BBComp = AIController->GetBlackboardComponent();
+	SetTargetActor(Pawn);
 
-		BBComp->SetValueAsObject("TargetActor", Pawn);
-
-		DrawDebugString(GetWorld(), GetActorLocation(), "Player spotted", nullptr, FColor::White, 4.f, true);
-	}
+	DrawDebugString(GetWorld(), GetActorLocation(), "Player spotted", nullptr, FColor::White, 4.f, true);
 }
 
 void AMcAICharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth,
@@ -44,6 +38,11 @@ void AMcAICharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeCompon
 {
 	if (Delta < 0.f)
 	{
+		if (InstigatorActor != this)
+		{
+			SetTargetActor(InstigatorActor);
+		}
+
 		if (NewHealth <= 0.f)
 		{
 			AAIController* AIC = Cast<AAIController>(GetController());
@@ -57,5 +56,14 @@ void AMcAICharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeCompon
 
 			SetLifeSpan(10.f);
 		}
+	}
+}
+
+void AMcAICharacter::SetTargetActor(AActor* NewTarget)
+{
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController)
+	{
+		AIController->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);
 	}
 }

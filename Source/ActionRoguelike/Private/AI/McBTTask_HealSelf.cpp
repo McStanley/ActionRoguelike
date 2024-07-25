@@ -19,7 +19,7 @@ EBTNodeResult::Type UMcBTTask_HealSelf::ExecuteTask(UBehaviorTreeComponent& Owne
 	);
 	if (AttributeComp == nullptr) return EBTNodeResult::Failed;
 
-	const bool HealingSuccess = AttributeComp->SetHealthToMax();
+	const bool HealingSuccess = AttributeComp->SetHealthToMax(AIPawn);
 
 	return HealingSuccess ? EBTNodeResult::Succeeded : EBTNodeResult::Failed;
 }

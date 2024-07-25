@@ -43,8 +43,8 @@ public:
 	FOnHealthChanged OnHealthChanged;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	bool ApplyHealthChange(const float Delta);
+	bool ApplyHealthChange(AActor* InstigatorActor, const float Delta);
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	bool SetHealthToMax();
+	bool SetHealthToMax(AActor* InstigatorActor);
 };

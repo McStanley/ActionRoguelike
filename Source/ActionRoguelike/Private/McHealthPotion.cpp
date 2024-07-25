@@ -22,7 +22,7 @@ void AMcHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 	{
 		if (!AttributeComp->HasFullHealth())
 		{
-			AttributeComp->SetHealthToMax();
+			AttributeComp->SetHealthToMax(this);
 
 			Deactivate();
 		}

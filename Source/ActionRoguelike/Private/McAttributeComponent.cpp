@@ -30,7 +30,7 @@ bool UMcAttributeComponent::HasFullHealth() const
 	return Health == HealthMax;
 }
 
-bool UMcAttributeComponent::ApplyHealthChange(const float Delta)
+bool UMcAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, const float Delta)
 {
 	const float OldHealth = Health;
 
@@ -39,12 +39,12 @@ bool UMcAttributeComponent::ApplyHealthChange(const float Delta)
 
 	const float ActualDelta = Health - OldHealth;
 
-	OnHealthChanged.Broadcast(nullptr, this, Health, ActualDelta);
+	OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);
 
 	return ActualDelta != 0;
 }
 
-bool UMcAttributeComponent::SetHealthToMax()
+bool UMcAttributeComponent::SetHealthToMax(AActor* InstigatorActor)
 {
 	const float Delta = HealthMax - Health;
 
@@ -55,7 +55,7 @@ bool UMcAttributeComponent::SetHealthToMax()
 
 	Health = HealthMax;
 
-	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
+	OnHealthChanged.Broadcast(InstigatorActor, this, Health, Delta);
 
 	return true;
 }

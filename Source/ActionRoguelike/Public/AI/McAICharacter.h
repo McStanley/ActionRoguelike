@@ -31,5 +31,7 @@ protected:
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth, float Delta);
 
+	void SetTargetActor(AActor* NewTarget);
+
 	virtual void PostInitializeComponents() override;
 };
