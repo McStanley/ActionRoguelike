@@ -8,6 +8,7 @@
 
 class UMcAttributeComponent;
 class UPawnSensingComponent;
+class UMcWorldUserWidget;
 
 UCLASS()
 class ACTIONROGUELIKE_API AMcAICharacter : public ACharacter
@@ -24,6 +25,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
+
+	UPROPERTY()
+	UMcWorldUserWidget* ActiveHealthBar;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParamName;

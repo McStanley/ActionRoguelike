@@ -6,7 +6,9 @@
 #include "AIController.h"
 #include "BrainComponent.h"
 #include "McAttributeComponent.h"
+#include "McWorldUserWidget.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "Perception/PawnSensingComponent.h"
 
 // Sets default values
@@ -43,6 +45,16 @@ void AMcAICharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeCompon
 		if (InstigatorActor != this)
 		{
 			SetTargetActor(InstigatorActor);
+		}
+
+		if (ActiveHealthBar == nullptr)
+		{
+			ActiveHealthBar = CreateWidget<UMcWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+			if (ActiveHealthBar)
+			{
+				ActiveHealthBar->AnchorActor = this;
+				ActiveHealthBar->AddToViewport();
+			}
 		}
 
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->GetTimeSeconds());
