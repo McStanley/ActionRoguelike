@@ -4,8 +4,14 @@
 #include "AI/McBTTask_RangedAttack.h"
 
 #include "AIController.h"
+#include "McAttributeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
+
+UMcBTTask_RangedAttack::UMcBTTask_RangedAttack()
+{
+	MaxSpread = 4.0f;
+}
 
 EBTNodeResult::Type UMcBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -26,11 +32,20 @@ EBTNodeResult::Type UMcBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& 
 			return EBTNodeResult::Failed;
 		}
 
+		if (!UMcAttributeComponent::IsActorAlive(TargetActor))
+		{
+			return EBTNodeResult::Failed;
+		}
+
 		FVector Direction = TargetActor->GetActorLocation() - MuzzleLocation;
 		FRotator MuzzleRotation = Direction.Rotation();
 
+		MuzzleRotation.Pitch += FMath::RandRange(0.0f, MaxSpread);
+		MuzzleRotation.Yaw += FMath::RandRange(-MaxSpread, MaxSpread);
+
 		FActorSpawnParameters Params;
 		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		Params.Instigator = AIPawn;
 
 		AActor* Projectile = GetWorld()->SpawnActor<AActor>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
 
