@@ -15,6 +15,8 @@ AMcAICharacter::AMcAICharacter()
 	AttributeComp = CreateDefaultSubobject<UMcAttributeComponent>("AttributeComp");
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 
+	TimeToHitParamName = "TimeToHit";
+
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
@@ -42,6 +44,8 @@ void AMcAICharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeCompon
 		{
 			SetTargetActor(InstigatorActor);
 		}
+
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->GetTimeSeconds());
 
 		if (NewHealth <= 0.f)
 		{

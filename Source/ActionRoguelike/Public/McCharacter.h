@@ -42,6 +42,9 @@ protected:
 	FTimerHandle TimerHandle_Projectile;
 	FTimerDelegate TimerDelegate_Projectile;
 
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParamName;
+
 public:
 	// Sets default values for this character's properties
 	AMcCharacter();

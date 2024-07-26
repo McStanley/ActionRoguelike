@@ -27,6 +27,8 @@ AMcCharacter::AMcCharacter()
 
 	InteractionComp = CreateDefaultSubobject<UMcInteractionComponent>("InteractionComp");
 
+	TimeToHitParamName = "TimeToHit";
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
@@ -181,7 +183,7 @@ void AMcCharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponen
 {
 	if (Delta < 0.f)
 	{
-		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->GetTimeSeconds());
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->GetTimeSeconds());
 
 		if (NewHealth <= 0.f)
 		{
