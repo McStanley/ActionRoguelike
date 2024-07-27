@@ -5,6 +5,7 @@
 
 #include "EngineUtils.h"
 #include "McAttributeComponent.h"
+#include "McCharacter.h"
 #include "AI/McAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 
@@ -83,6 +84,33 @@ void AMcGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryI
 
 		DrawDebugSphere(GetWorld(), Locations[0], 50.f, 20, FColor::Blue, false, 15.f);
 	}
+}
+
+void AMcGameModeBase::OnActorKilled(AActor* VictimActor, AActor* KillerActor)
+{
+	if (const AMcCharacter* Player = Cast<AMcCharacter>(VictimActor))
+	{
+		FTimerHandle TimerHandle_RespawnDelay;
+
+		FTimerDelegate TimerDelegate_RespawnPlayer;
+		TimerDelegate_RespawnPlayer.BindUFunction(this, FName("RespawnPlayerElapsed"), Player->GetController());
+
+		constexpr float RespawnDelay = 3.5f;
+
+		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, TimerDelegate_RespawnPlayer, RespawnDelay, false);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim %s, Killer %s"),
+	       *GetNameSafe(VictimActor), *GetNameSafe(KillerActor));
+}
+
+void AMcGameModeBase::RespawnPlayerElapsed(AController* Controller)
+{
+	if (!ensure(Controller)) return;
+
+	Controller->UnPossess();
+
+	RestartPlayer(Controller);
 }
 
 void AMcGameModeBase::KillAllAI()

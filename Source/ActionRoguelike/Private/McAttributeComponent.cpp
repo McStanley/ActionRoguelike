@@ -3,6 +3,8 @@
 
 #include "McAttributeComponent.h"
 
+#include "McGameModeBase.h"
+
 UMcAttributeComponent* UMcAttributeComponent::GetAttributeComponent(AActor* FromActor)
 {
 	if (FromActor == nullptr)
@@ -66,6 +68,15 @@ bool UMcAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, const flo
 	const float ActualDelta = Health - OldHealth;
 
 	OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);
+
+	if (ActualDelta < 0.f && Health == 0.f)
+	{
+		AMcGameModeBase* GM = GetWorld()->GetAuthGameMode<AMcGameModeBase>();
+		if (GM)
+		{
+			GM->OnActorKilled(GetOwner(), InstigatorActor);
+		}
+	}
 
 	return ActualDelta != 0;
 }
