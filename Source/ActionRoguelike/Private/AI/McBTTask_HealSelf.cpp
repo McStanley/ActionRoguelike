@@ -14,9 +14,7 @@ EBTNodeResult::Type UMcBTTask_HealSelf::ExecuteTask(UBehaviorTreeComponent& Owne
 	APawn* AIPawn = AIController->GetPawn();
 	if (AIPawn == nullptr) return EBTNodeResult::Failed;
 
-	UMcAttributeComponent* AttributeComp = Cast<UMcAttributeComponent>(
-		AIPawn->GetComponentByClass(UMcAttributeComponent::StaticClass())
-	);
+	UMcAttributeComponent* AttributeComp = UMcAttributeComponent::GetAttributeComponent(AIPawn);
 	if (AttributeComp == nullptr) return EBTNodeResult::Failed;
 
 	const bool HealingSuccess = AttributeComp->SetHealthToMax(AIPawn);

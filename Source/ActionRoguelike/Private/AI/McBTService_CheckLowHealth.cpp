@@ -20,9 +20,7 @@ void UMcBTService_CheckLowHealth::TickNode(UBehaviorTreeComponent& OwnerComp, ui
 	if (!AIPawn) return;
 
 
-	UMcAttributeComponent* AttributeComp = Cast<UMcAttributeComponent>(
-		AIPawn->GetComponentByClass(UMcAttributeComponent::StaticClass())
-	);
+	UMcAttributeComponent* AttributeComp = UMcAttributeComponent::GetAttributeComponent(AIPawn);
 	if (!ensure(AttributeComp)) return;
 
 	const float HealthPercent = AttributeComp->GetHealthPercent();
