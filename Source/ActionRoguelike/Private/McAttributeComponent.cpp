@@ -53,6 +53,11 @@ bool UMcAttributeComponent::HasFullHealth() const
 
 bool UMcAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, const float Delta)
 {
+	if (Delta < 0.f && !GetOwner()->CanBeDamaged())
+	{
+		return false;
+	}
+
 	const float OldHealth = Health;
 
 	const float NewHealth = Health + Delta;
@@ -79,4 +84,9 @@ bool UMcAttributeComponent::SetHealthToMax(AActor* InstigatorActor)
 	OnHealthChanged.Broadcast(InstigatorActor, this, Health, Delta);
 
 	return true;
+}
+
+bool UMcAttributeComponent::Kill(AActor* InstigatorActor)
+{
+	return ApplyHealthChange(InstigatorActor, -HealthMax);
 }

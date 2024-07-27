@@ -193,3 +193,8 @@ void AMcCharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponen
 		}
 	}
 }
+
+void AMcCharacter::HealSelf(float Amount /* = 100 */)
+{
+	AttributeComp->ApplyHealthChange(this, Amount);
+}

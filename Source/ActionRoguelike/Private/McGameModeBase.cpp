@@ -84,3 +84,18 @@ void AMcGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryI
 		DrawDebugSphere(GetWorld(), Locations[0], 50.f, 20, FColor::Blue, false, 15.f);
 	}
 }
+
+void AMcGameModeBase::KillAllAI()
+{
+	for (TActorIterator<AMcAICharacter> It(GetWorld()); It; ++It)
+	{
+		AMcAICharacter* Bot = *It;
+
+		UMcAttributeComponent* AttributeComp = UMcAttributeComponent::GetAttributeComponent(Bot);
+
+		if (ensure(AttributeComp) && AttributeComp->IsALive())
+		{
+			AttributeComp->Kill(this);
+		}
+	}
+}
