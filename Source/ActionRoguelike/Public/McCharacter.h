@@ -88,6 +88,8 @@ protected:
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth, float Delta);
 
+	virtual FVector GetPawnViewLocation() const override;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -198,3 +198,8 @@ void AMcCharacter::HealSelf(float Amount /* = 100 */)
 {
 	AttributeComp->ApplyHealthChange(this, Amount);
 }
+
+FVector AMcCharacter::GetPawnViewLocation() const
+{
+	return CameraComp->GetComponentLocation();
+}
