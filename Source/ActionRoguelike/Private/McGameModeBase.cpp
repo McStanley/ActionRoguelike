@@ -9,6 +9,10 @@
 #include "AI/McAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 
+static TAutoConsoleVariable<bool> CVarSpawnBots(
+	TEXT("mc.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat
+);
+
 AMcGameModeBase::AMcGameModeBase()
 {
 	SpawnTimerInterval = 2.f;
@@ -24,6 +28,12 @@ void AMcGameModeBase::StartPlay()
 
 void AMcGameModeBase::OnSpawnTimerElapsed()
 {
+	if (!CVarSpawnBots.GetValueOnGameThread())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Bot spawning disabled: CVarSpawnBots."));
+		return;
+	}
+
 	int32 BotsAliveCount = 0;
 
 	for (TActorIterator<AMcAICharacter> It(GetWorld()); It; ++It)

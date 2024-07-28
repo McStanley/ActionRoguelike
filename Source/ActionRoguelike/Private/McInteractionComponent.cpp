@@ -6,6 +6,10 @@
 #include "McGameplayInterface.h"
 #include "Kismet/GameplayStatics.h"
 
+static TAutoConsoleVariable<bool> CVarDrawDebugInteraction(
+	TEXT("mc.DrawDebugInteraction"), false, TEXT("Enable DrawDebug helpers for Interaction Component."), ECVF_Cheat
+);
+
 // Sets default values for this component's properties
 UMcInteractionComponent::UMcInteractionComponent()
 {
@@ -38,6 +42,8 @@ void UMcInteractionComponent::TickComponent(float DeltaTime,
 
 void UMcInteractionComponent::PrimaryInteract()
 {
+	const bool bDrawDebugHelpers = CVarDrawDebugInteraction.GetValueOnGameThread();
+
 	TArray<FHitResult> Hits;
 
 	FVector EyeLocation;
@@ -47,7 +53,11 @@ void UMcInteractionComponent::PrimaryInteract()
 	Owner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
 	FVector CameraLocation = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraLocation();
-	// DrawDebugString(GetWorld(), CameraLocation, "Camera here", nullptr, FColor::Blue, 5.f, true);
+
+	if (bDrawDebugHelpers)
+	{
+		DrawDebugString(GetWorld(), CameraLocation, "Camera here", nullptr, FColor::Blue, 5.f, true);
+	}
 
 	FVector End = CameraLocation + (EyeRotation.Vector() * 1000);
 
@@ -69,7 +79,10 @@ void UMcInteractionComponent::PrimaryInteract()
 
 	for (FHitResult Hit : Hits)
 	{
-		DrawDebugSphere(GetWorld(), Hit.Location, Radius, 32, DebugColor, false, DebugLifeTime);
+		if (bDrawDebugHelpers)
+		{
+			DrawDebugSphere(GetWorld(), Hit.Location, Radius, 32, DebugColor, false, DebugLifeTime);
+		}
 
 		AActor* HitActor = Hit.GetActor();
 
@@ -77,7 +90,10 @@ void UMcInteractionComponent::PrimaryInteract()
 		{
 			IMcGameplayInterface::Execute_Interact(HitActor, Cast<APawn>(Owner));
 
-			DrawDebugLine(GetWorld(), EyeLocation, Hit.Location, DebugColor, false, DebugLifeTime, 0, 2.0f);
+			if (bDrawDebugHelpers)
+			{
+				DrawDebugLine(GetWorld(), EyeLocation, Hit.Location, DebugColor, false, DebugLifeTime, 0, 2.0f);
+			}
 
 			bInteractExecuted = true;
 			break;
@@ -86,6 +102,9 @@ void UMcInteractionComponent::PrimaryInteract()
 
 	if (!bInteractExecuted)
 	{
-		DrawDebugLine(GetWorld(), EyeLocation, End, DebugColor, false, DebugLifeTime, 0, 2.0f);
+		if (bDrawDebugHelpers)
+		{
+			DrawDebugLine(GetWorld(), EyeLocation, End, DebugColor, false, DebugLifeTime, 0, 2.0f);
+		}
 	}
 }

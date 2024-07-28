@@ -5,6 +5,10 @@
 
 #include "McGameModeBase.h"
 
+static TAutoConsoleVariable<float> CVarDamageMultiplier(
+	TEXT("mc.DamageMultiplier"), 1.0f, TEXT("Global damage multiplier for Attribute Component."), ECVF_Cheat
+);
+
 UMcAttributeComponent* UMcAttributeComponent::GetAttributeComponent(AActor* FromActor)
 {
 	if (FromActor == nullptr)
@@ -53,11 +57,17 @@ bool UMcAttributeComponent::HasFullHealth() const
 	return Health == HealthMax;
 }
 
-bool UMcAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, const float Delta)
+bool UMcAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
-	if (Delta < 0.f && !GetOwner()->CanBeDamaged())
+	if (Delta < 0.f)
 	{
-		return false;
+		if (!GetOwner()->CanBeDamaged())
+		{
+			return false;
+		}
+
+		const float DamageMultiplier = CVarDamageMultiplier.GetValueOnGameThread();
+		Delta *= DamageMultiplier;
 	}
 
 	const float OldHealth = Health;
