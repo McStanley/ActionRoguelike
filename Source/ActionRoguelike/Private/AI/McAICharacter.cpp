@@ -9,6 +9,8 @@
 #include "McWorldUserWidget.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/PawnSensingComponent.h"
 
 // Sets default values
@@ -18,6 +20,9 @@ AMcAICharacter::AMcAICharacter()
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 
 	TimeToHitParamName = "TimeToHit";
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
@@ -69,6 +74,9 @@ void AMcAICharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeCompon
 
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
 			GetMesh()->SetCollisionProfileName("Ragdoll");
+
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			GetCharacterMovement()->DisableMovement();
 
 			SetLifeSpan(10.f);
 		}

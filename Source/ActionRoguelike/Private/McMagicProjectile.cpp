@@ -3,7 +3,7 @@
 
 #include "McMagicProjectile.h"
 
-#include "McAttributeComponent.h"
+#include "McGameplayFunctionLibrary.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -48,14 +48,10 @@ void AMcMagicProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponen
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		UMcAttributeComponent* AttributeComp = UMcAttributeComponent::GetAttributeComponent(OtherActor);
-
-		if (AttributeComp != nullptr)
+		if (UMcGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
 		{
-			AttributeComp->ApplyHealthChange(GetInstigator(), -DamageAmount);
+			Explode();
 		}
-
-		Explode();
 	}
 }
 
