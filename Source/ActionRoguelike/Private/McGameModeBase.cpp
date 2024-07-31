@@ -6,6 +6,7 @@
 #include "EngineUtils.h"
 #include "McAttributeComponent.h"
 #include "McCharacter.h"
+#include "McPlayerState.h"
 #include "AI/McAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 
@@ -108,6 +109,17 @@ void AMcGameModeBase::OnActorKilled(AActor* VictimActor, AActor* KillerActor)
 		constexpr float RespawnDelay = 3.5f;
 
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, TimerDelegate_RespawnPlayer, RespawnDelay, false);
+	}
+
+	if (const AMcCharacter* Player = Cast<AMcCharacter>(KillerActor))
+	{
+		if (const AMcAICharacter* Bot = Cast<AMcAICharacter>(VictimActor))
+		{
+			if (AMcPlayerState* State = Player->GetPlayerStateChecked<AMcPlayerState>())
+			{
+				State->AddCredits(VictimActor, 1);
+			}
+		}
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim %s, Killer %s"),

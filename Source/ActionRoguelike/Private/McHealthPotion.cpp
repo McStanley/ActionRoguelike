@@ -4,6 +4,7 @@
 #include "McHealthPotion.h"
 
 #include "McAttributeComponent.h"
+#include "McPlayerState.h"
 
 AMcHealthPotion::AMcHealthPotion()
 {
@@ -16,10 +17,12 @@ void AMcHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 
 	UMcAttributeComponent* AttributeComp = UMcAttributeComponent::GetAttributeComponent(InstigatorPawn);
 
-	if (AttributeComp != nullptr)
+	if (AttributeComp && !AttributeComp->HasFullHealth())
 	{
-		if (!AttributeComp->HasFullHealth())
+		AMcPlayerState* PlayerState = InstigatorPawn->GetPlayerState<AMcPlayerState>();
+		if (PlayerState && PlayerState->GetCredits() > 0)
 		{
+			PlayerState->SpendCredits(this, 1);
 			AttributeComp->SetHealthToMax(this);
 
 			Deactivate();
