@@ -28,10 +28,25 @@ public:
 	virtual void StartPlay() override;
 
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Level")
+	UEnvQuery* PickUpQuery = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Level")
+	int32 CoinsQuantity;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Level")
+	TSubclassOf<AActor> CoinClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Level")
+	int32 HealthPotionsQuantity;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Level")
+	TSubclassOf<AActor> HealthPotionClass;
+
 	FTimerHandle TimerHandle_SpawnBots;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	float SpawnTimerInterval;
+	float BotSpawnTimerInterval;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UEnvQuery* BotSpawnQuery = nullptr;
@@ -43,10 +58,13 @@ protected:
 	TSubclassOf<AActor> MinionClass;
 
 	UFUNCTION()
-	void OnSpawnTimerElapsed();
+	void OnPickUpQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	UFUNCTION()
-	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+	void OnBotSpawnTimerElapsed();
+
+	UFUNCTION()
+	void OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);

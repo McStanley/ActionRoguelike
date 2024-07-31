@@ -16,18 +16,91 @@ static TAutoConsoleVariable<bool> CVarSpawnBots(
 
 AMcGameModeBase::AMcGameModeBase()
 {
-	SpawnTimerInterval = 2.f;
+	CoinsQuantity = 3;
+	HealthPotionsQuantity = 4;
+
+	BotSpawnTimerInterval = 2.f;
 }
 
 void AMcGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &AMcGameModeBase::OnSpawnTimerElapsed,
-	                                SpawnTimerInterval, true);
+	UEnvQueryInstanceBlueprintWrapper* PickUpQueryInstance = UEnvQueryManager::RunEQSQuery(
+		this, PickUpQuery, this, EEnvQueryRunMode::AllMatching, nullptr
+	);
+
+	if (ensure(PickUpQueryInstance))
+	{
+		PickUpQueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &AMcGameModeBase::OnPickUpQueryCompleted);
+	}
+
+	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &AMcGameModeBase::OnBotSpawnTimerElapsed,
+	                                BotSpawnTimerInterval, true);
 }
 
-void AMcGameModeBase::OnSpawnTimerElapsed()
+void AMcGameModeBase::OnPickUpQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+                                             EEnvQueryStatus::Type QueryStatus)
+{
+	if (QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp, Type::Warning, TEXT("PickUp EQS query failed!"))
+		return;
+	}
+
+	TArray<FVector> Locations;
+	QueryInstance->GetQueryResultsAsLocations(Locations);
+
+	const int32 LocationsSize = Locations.Num();
+
+	if (!LocationsSize)
+	{
+		UE_LOG(LogTemp, Type::Warning, TEXT("No valid pick up locations found!"));
+		return;
+	}
+
+	TArray<int> Indices;
+
+	const int32 ItemsQuantity = CoinsQuantity + HealthPotionsQuantity;
+
+	int32 CoinsSpawned = 0;
+	int32 HealthPotionsSpawned = 0;
+
+	while (Indices.Num() < ItemsQuantity && Indices.Num() < LocationsSize)
+	{
+		int32 RandIndex = FMath::RandRange(0, LocationsSize - 1);
+
+		if (Indices.Contains(RandIndex)) continue;
+
+		Indices.Add(RandIndex);
+
+		const bool bAllCoinsSpawned = CoinsSpawned >= CoinsQuantity;
+		const bool bAllHealthPotionsSpawned = HealthPotionsSpawned >= HealthPotionsQuantity;
+
+		const bool bPreferCoin = FMath::RandBool();
+
+		const bool bSpawnCoin = (!bAllCoinsSpawned && bPreferCoin) || bAllHealthPotionsSpawned;
+
+		// UE_LOG(LogTemp, Type::Display, TEXT("bSpawnCoin: %d"), bSpawnCoin);
+
+		TSubclassOf<AActor> ClassToSpawn = bSpawnCoin ? CoinClass : HealthPotionClass;
+		int32* XSpawned = bSpawnCoin ? &CoinsSpawned : &HealthPotionsSpawned;
+
+		FVector Location = Locations[RandIndex];
+
+		// Adjust health potion vertical offset
+		if (!bSpawnCoin)
+		{
+			Location += FVector(0.f, 0.f, -30.f);
+		}
+
+		GetWorld()->SpawnActor<AActor>(ClassToSpawn, Location, FRotator::ZeroRotator);
+
+		*XSpawned += 1;;
+	}
+}
+
+void AMcGameModeBase::OnBotSpawnTimerElapsed()
 {
 	if (!CVarSpawnBots.GetValueOnGameThread())
 	{
@@ -70,12 +143,12 @@ void AMcGameModeBase::OnSpawnTimerElapsed()
 
 	if (ensure(QueryInstance))
 	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &AMcGameModeBase::OnQueryCompleted);
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &AMcGameModeBase::OnBotQueryCompleted);
 	}
 }
 
-void AMcGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
-                                       EEnvQueryStatus::Type QueryStatus)
+void AMcGameModeBase::OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+                                          EEnvQueryStatus::Type QueryStatus)
 {
 	if (QueryStatus != EEnvQueryStatus::Success)
 	{
