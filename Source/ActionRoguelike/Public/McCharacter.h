@@ -73,6 +73,8 @@ protected:
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+	void SprintStart();
+	void SprintStop();
 	void Teleport();
 	void PrimaryAttack();
 	void SecondaryAttack();
