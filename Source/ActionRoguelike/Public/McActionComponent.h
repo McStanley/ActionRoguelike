@@ -27,6 +27,9 @@ public:
 	bool StopActionByName(AActor* Instigator, FName ActionName);
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "Actions")
+	TArray<TSubclassOf<UMcAction>> DefaultActions;
+
 	UPROPERTY()
 	TArray<TObjectPtr<UMcAction>> Actions;
 

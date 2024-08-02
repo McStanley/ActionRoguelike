@@ -9,7 +9,6 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMcCharacter::AMcCharacter()
@@ -114,84 +113,22 @@ void AMcCharacter::SprintStop()
 
 void AMcCharacter::Teleport()
 {
-	UseProjectile(TeleportAnim, 0.2f, TeleportClass, "Muzzle_02", 1000.f);
+	ActionComp->StartActionByName(this, "Teleport");
 }
 
 void AMcCharacter::PrimaryAttack()
 {
-	UseProjectile(MagicProjectileAnim, 0.2f, MagicProjectileClass, "Muzzle_01");
+	ActionComp->StartActionByName(this, "PrimaryAttack");
 }
 
 void AMcCharacter::SecondaryAttack()
 {
-	UseProjectile(BlackHoleAnim, 0.15f, BlackHoleClass, "Muzzle_01");
+	ActionComp->StartActionByName(this, "SecondaryAttack");
 }
 
 void AMcCharacter::PrimaryInteract()
 {
 	InteractionComp->PrimaryInteract();
-}
-
-void AMcCharacter::UseProjectile(UAnimMontage* AnimMontage,
-                                 const float TimerDelay,
-                                 TSubclassOf<AActor>& Class,
-                                 FName Socket,
-                                 float MaxDistance)
-{
-	if (ensureAlways(AnimMontage && Class))
-	{
-		if (ensure(CastingEffect))
-		{
-			UGameplayStatics::SpawnEmitterAttached(CastingEffect, GetMesh(), Socket);
-		}
-
-		PlayAnimMontage(AnimMontage);
-
-		TimerDelegate_Projectile.BindUFunction(this, FName("UseProjectile_TimerCallback"), Class, Socket, MaxDistance);
-
-		GetWorldTimerManager().SetTimer(TimerHandle_Projectile, TimerDelegate_Projectile, TimerDelay, false);
-	}
-}
-
-void AMcCharacter::UseProjectile_TimerCallback(const TSubclassOf<AActor>& Class, FName Socket, float MaxDistance)
-{
-	const FTransform SpawnTM = GetProjectileSpawnTM(Socket, MaxDistance);
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	GetWorld()->SpawnActor<AActor>(Class, SpawnTM, SpawnParams);
-}
-
-FTransform AMcCharacter::GetProjectileSpawnTM(const FName Socket, float MaxDistance) const
-{
-	FRotator ControlRotation = this->GetControlRotation();
-	FVector HandLocation = GetMesh()->GetSocketLocation(Socket);
-	FVector CameraLocation = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraLocation();
-
-	FVector TraceEnd = CameraLocation + (ControlRotation.Vector() * MaxDistance);
-
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_Destructible);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_PhysicsBody);
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
-
-	FHitResult Hit;
-
-	bool bHitFound = GetWorld()->LineTraceSingleByObjectType(Hit, CameraLocation, TraceEnd, ObjectQueryParams);
-
-	FVector Target = bHitFound ? Hit.Location : TraceEnd;
-	// DrawDebugString(GetWorld(), Target, "Target here", nullptr, FColor::Blue, 5.f, true);
-
-	FVector ProjectilePath = Target - HandLocation;
-	FRotator ProjectileRotation = ProjectilePath.Rotation();
-
-	FTransform SpawnTM = FTransform(ProjectileRotation, HandLocation);
-
-	return SpawnTM;
 }
 
 void AMcCharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth,

@@ -11,7 +11,6 @@ class UMcAttributeComponent;
 class UMcInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
-class UAnimMontage;
 
 UCLASS()
 class ACTIONROGUELIKE_API AMcCharacter : public ACharacter
@@ -19,30 +18,6 @@ class ACTIONROGUELIKE_API AMcCharacter : public ACharacter
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Projectiles")
-	UParticleSystem* CastingEffect;
-
-	UPROPERTY(EditAnywhere, Category = "Projectiles")
-	TSubclassOf<AActor> MagicProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Projectiles")
-	UAnimMontage* MagicProjectileAnim;
-
-	UPROPERTY(EditAnywhere, Category = "Projectiles")
-	TSubclassOf<AActor> BlackHoleClass;
-
-	UPROPERTY(EditAnywhere, Category = "Projectiles")
-	UAnimMontage* BlackHoleAnim;
-
-	UPROPERTY(EditAnywhere, Category = "Projectiles")
-	TSubclassOf<AActor> TeleportClass;
-
-	UPROPERTY(EditAnywhere, Category = "Projectiles")
-	UAnimMontage* TeleportAnim;
-
-	FTimerHandle TimerHandle_Projectile;
-	FTimerDelegate TimerDelegate_Projectile;
-
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParamName;
 
@@ -79,17 +54,6 @@ protected:
 	void PrimaryAttack();
 	void SecondaryAttack();
 	void PrimaryInteract();
-
-	void UseProjectile(UAnimMontage* AnimMontage,
-	                   const float TimerDelay,
-	                   TSubclassOf<AActor>& Class,
-	                   FName Socket,
-	                   float MaxDistance = 10000.f);
-
-	UFUNCTION()
-	void UseProjectile_TimerCallback(const TSubclassOf<AActor>& Class, FName Socket, float MaxDistance);
-
-	FTransform GetProjectileSpawnTM(const FName Socket, float MaxDistance) const;
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth, float Delta);

@@ -13,6 +13,11 @@ UMcActionComponent::UMcActionComponent()
 void UMcActionComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	for (TSubclassOf<UMcAction> ActionClass : DefaultActions)
+	{
+		AddAction(ActionClass);
+	}
 }
 
 
