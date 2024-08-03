@@ -44,6 +44,11 @@ bool UMcActionComponent::StartActionByName(AActor* Instigator, const FName Actio
 	{
 		if (Action && Action->ActionName == ActionName)
 		{
+			if (!Action->CanStart(Instigator))
+			{
+				continue;
+			}
+
 			Action->StartAction(Instigator);
 			return true;
 		}
@@ -58,8 +63,11 @@ bool UMcActionComponent::StopActionByName(AActor* Instigator, const FName Action
 	{
 		if (Action && Action->ActionName == ActionName)
 		{
-			Action->StopAction(Instigator);
-			return true;
+			if (Action->IsRunning())
+			{
+				Action->StopAction(Instigator);
+				return true;
+			}
 		}
 	}
 
