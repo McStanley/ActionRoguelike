@@ -3,6 +3,7 @@
 
 #include "McMagicProjectile.h"
 
+#include "McActionComponent.h"
 #include "McGameplayFunctionLibrary.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
@@ -22,6 +23,8 @@ AMcMagicProjectile::AMcMagicProjectile()
 	SphereComp->OnComponentHit.AddDynamic(this, &AMcMagicProjectile::OnSphereHit);
 
 	MovementComp->InitialSpeed = 2000.f;
+
+	bParried = false;
 }
 
 void AMcMagicProjectile::PostInitializeComponents()
@@ -48,6 +51,22 @@ void AMcMagicProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponen
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
+		UMcActionComponent* ActionComp = Cast<UMcActionComponent>(
+			OtherActor->GetComponentByClass(UMcActionComponent::StaticClass())
+		);
+		if (ActionComp && ActionComp->ActiveGameplayTags.HasTag(ParryTag))
+		{
+			if (!bParried)
+			{
+				MovementComp->Velocity *= -1;
+				SetInstigator(Cast<APawn>(OtherActor));
+
+				bParried = true;
+
+				return;
+			}
+		}
+
 		if (UMcGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
 		{
 			Explode();

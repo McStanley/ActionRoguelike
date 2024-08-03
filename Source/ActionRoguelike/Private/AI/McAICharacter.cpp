@@ -5,6 +5,7 @@
 
 #include "AIController.h"
 #include "BrainComponent.h"
+#include "McActionComponent.h"
 #include "McAttributeComponent.h"
 #include "McWorldUserWidget.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -18,6 +19,7 @@ AMcAICharacter::AMcAICharacter()
 {
 	AttributeComp = CreateDefaultSubobject<UMcAttributeComponent>("AttributeComp");
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
+	ActionComp = CreateDefaultSubobject<UMcActionComponent>("ActionComp");
 
 	TimeToHitParamName = "TimeToHit";
 

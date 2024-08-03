@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "McProjectile.h"
 #include "McMagicProjectile.generated.h"
 
@@ -33,6 +34,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Damage")
 	float DamageAmount = 20.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	FGameplayTag ParryTag;
+
+	bool bParried;
 
 	UFUNCTION()
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,

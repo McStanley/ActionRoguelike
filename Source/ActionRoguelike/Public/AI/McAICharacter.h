@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "McAICharacter.generated.h"
 
+class UMcActionComponent;
 class UMcAttributeComponent;
 class UPawnSensingComponent;
 class UMcWorldUserWidget;
@@ -25,6 +26,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UMcActionComponent* ActionComp;
 
 	UPROPERTY()
 	UMcWorldUserWidget* ActiveHealthBar;
