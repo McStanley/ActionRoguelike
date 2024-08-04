@@ -4,43 +4,40 @@
 #include "McInteractionComponent.h"
 
 #include "McGameplayInterface.h"
+#include "McWorldUserWidget.h"
+#include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
 static TAutoConsoleVariable<bool> CVarDrawDebugInteraction(
 	TEXT("mc.DrawDebugInteraction"), false, TEXT("Enable DrawDebug helpers for Interaction Component."), ECVF_Cheat
 );
 
-// Sets default values for this component's properties
 UMcInteractionComponent::UMcInteractionComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	TraceDistance = 500.f;
+	TraceRadius = 30.f;
+	CollisionChannel = ECC_WorldDynamic;
 }
 
 
-// Called when the game starts
 void UMcInteractionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 }
 
 
-// Called every frame
 void UMcInteractionComponent::TickComponent(float DeltaTime,
                                             ELevelTick TickType,
                                             FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	FindBestTarget();
 }
 
-void UMcInteractionComponent::PrimaryInteract()
+void UMcInteractionComponent::FindBestTarget()
 {
 	const bool bDrawDebugHelpers = CVarDrawDebugInteraction.GetValueOnGameThread();
 
@@ -59,15 +56,13 @@ void UMcInteractionComponent::PrimaryInteract()
 		DrawDebugString(GetWorld(), CameraLocation, "Camera here", nullptr, FColor::Blue, 5.f, true);
 	}
 
-	FVector End = CameraLocation + (EyeRotation.Vector() * 1000);
+	FVector End = CameraLocation + (EyeRotation.Vector() * TraceDistance);
 
 	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-
-	constexpr float Radius = 30.f;
+	ObjectQueryParams.AddObjectTypesToQuery(CollisionChannel);
 
 	FCollisionShape Shape;
-	Shape.SetSphere(Radius);
+	Shape.SetSphere(TraceRadius);
 
 	const bool bHitFound = GetWorld()->SweepMultiByObjectType(Hits, CameraLocation, End, FQuat::Identity,
 	                                                          ObjectQueryParams, Shape);
@@ -75,36 +70,68 @@ void UMcInteractionComponent::PrimaryInteract()
 	const FColor DebugColor = bHitFound ? FColor::Green : FColor::Red;
 	constexpr float DebugLifeTime = 2.0f;
 
-	bool bInteractExecuted = false;
+	TargetActor = nullptr;
 
 	for (FHitResult Hit : Hits)
 	{
 		if (bDrawDebugHelpers)
 		{
-			DrawDebugSphere(GetWorld(), Hit.Location, Radius, 32, DebugColor, false, DebugLifeTime);
+			DrawDebugSphere(GetWorld(), Hit.Location, TraceRadius, 32, DebugColor, false, DebugLifeTime);
 		}
 
 		AActor* HitActor = Hit.GetActor();
 
 		if (HitActor && HitActor->Implements<UMcGameplayInterface>())
 		{
-			IMcGameplayInterface::Execute_Interact(HitActor, Cast<APawn>(Owner));
+			TargetActor = HitActor;
 
 			if (bDrawDebugHelpers)
 			{
 				DrawDebugLine(GetWorld(), EyeLocation, Hit.Location, DebugColor, false, DebugLifeTime, 0, 2.0f);
 			}
 
-			bInteractExecuted = true;
 			break;
 		}
 	}
 
-	if (!bInteractExecuted)
+	if (TargetActor)
 	{
+		if (DefaultWidgetInstance == nullptr && ensure(DefaultWidgetClass))
+		{
+			DefaultWidgetInstance = CreateWidget<UMcWorldUserWidget>(GetWorld(), DefaultWidgetClass);
+		}
+
+		if (DefaultWidgetInstance)
+		{
+			DefaultWidgetInstance->AnchorActor = TargetActor;
+
+			if (!DefaultWidgetInstance->IsInViewport())
+			{
+				DefaultWidgetInstance->AddToViewport();
+			}
+		}
+	}
+	else
+	{
+		if (DefaultWidgetInstance)
+		{
+			DefaultWidgetInstance->RemoveFromParent();
+		}
+
 		if (bDrawDebugHelpers)
 		{
 			DrawDebugLine(GetWorld(), EyeLocation, End, DebugColor, false, DebugLifeTime, 0, 2.0f);
 		}
 	}
+}
+
+void UMcInteractionComponent::PrimaryInteract()
+{
+	if (TargetActor == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "No TargetActor to interact with.");
+		return;
+	}
+
+	IMcGameplayInterface::Execute_Interact(TargetActor, Cast<APawn>(GetOwner()));
 }

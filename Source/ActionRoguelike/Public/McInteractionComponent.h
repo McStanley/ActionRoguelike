@@ -7,6 +7,8 @@
 #include "McInteractionComponent.generated.h"
 
 
+class UMcWorldUserWidget;
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ACTIONROGUELIKE_API UMcInteractionComponent : public UActorComponent
 {
@@ -19,6 +21,26 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	void FindBestTarget();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	float TraceDistance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	float TraceRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	TEnumAsByte<ECollisionChannel> CollisionChannel;
+
+	UPROPERTY()
+	AActor* TargetActor;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UMcWorldUserWidget> DefaultWidgetClass;
+
+	UPROPERTY()
+	UMcWorldUserWidget* DefaultWidgetInstance;
 
 public:
 	// Called every frame
