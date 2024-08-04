@@ -16,7 +16,7 @@ void UMcActionComponent::BeginPlay()
 
 	for (TSubclassOf<UMcAction> ActionClass : DefaultActions)
 	{
-		AddAction(ActionClass);
+		AddAction(GetOwner(), ActionClass);
 	}
 }
 
@@ -27,7 +27,7 @@ void UMcActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UMcActionComponent::AddAction(TSubclassOf<UMcAction> ActionClass)
+void UMcActionComponent::AddAction(AActor* Instigator, TSubclassOf<UMcAction> ActionClass)
 {
 	if (!ensure(ActionClass)) return;
 
@@ -35,6 +35,19 @@ void UMcActionComponent::AddAction(TSubclassOf<UMcAction> ActionClass)
 	if (ensure(NewAction))
 	{
 		Actions.Add(NewAction);
+
+		if (NewAction->bAutoStart && ensure(NewAction->CanStart(Instigator)))
+		{
+			NewAction->StartAction(Instigator);
+		}
+	}
+}
+
+void UMcActionComponent::RemoveAction(UMcAction* Action)
+{
+	if (ensure(Action && !Action->IsRunning()))
+	{
+		Actions.Remove(Action);
 	}
 }
 

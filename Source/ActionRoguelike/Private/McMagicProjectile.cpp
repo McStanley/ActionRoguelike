@@ -4,6 +4,7 @@
 #include "McMagicProjectile.h"
 
 #include "McActionComponent.h"
+#include "McActionEffect.h"
 #include "McGameplayFunctionLibrary.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
@@ -70,6 +71,11 @@ void AMcMagicProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponen
 		if (UMcGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
 		{
 			Explode();
+
+			if (ActionComp)
+			{
+				ActionComp->AddAction(GetInstigator(), BurningEffectClass);
+			}
 		}
 	}
 }

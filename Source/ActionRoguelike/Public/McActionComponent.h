@@ -19,7 +19,10 @@ public:
 	UMcActionComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
-	void AddAction(TSubclassOf<UMcAction> ActionClass);
+	void AddAction(AActor* Instigator, TSubclassOf<UMcAction> ActionClass);
+
+	UFUNCTION(BlueprintCallable, Category = "Actions")
+	void RemoveAction(UMcAction* Action);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
 	bool StartActionByName(AActor* Instigator, FName ActionName);

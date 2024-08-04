@@ -21,6 +21,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Action")
 	FName ActionName;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	bool bAutoStart;
+
 	UFUNCTION(BlueprintNativeEvent, Category = "Action")
 	bool CanStart(AActor* Instigator);
 

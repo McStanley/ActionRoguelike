@@ -7,6 +7,8 @@
 #include "McProjectile.h"
 #include "McMagicProjectile.generated.h"
 
+class UMcActionEffect;
+
 UCLASS()
 class ACTIONROGUELIKE_API AMcMagicProjectile : public AMcProjectile
 {
@@ -37,6 +39,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	FGameplayTag ParryTag;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<UMcActionEffect> BurningEffectClass;
 
 	bool bParried;
 
