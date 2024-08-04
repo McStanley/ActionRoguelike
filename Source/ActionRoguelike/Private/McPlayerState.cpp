@@ -15,6 +15,11 @@ int32 AMcPlayerState::GetCredits() const
 
 bool AMcPlayerState::AddCredits(AActor* InstigatorActor, int32 Amount)
 {
+	if (!ensure(Amount > 0))
+	{
+		return false;
+	}
+
 	Credits += Amount;
 
 	OnCreditsChanged.Broadcast(InstigatorActor, this, Credits, Amount);
@@ -24,7 +29,15 @@ bool AMcPlayerState::AddCredits(AActor* InstigatorActor, int32 Amount)
 
 bool AMcPlayerState::SpendCredits(AActor* InstigatorActor, int32 Amount)
 {
-	if (Amount > Credits) return false;
+	if (!ensure(Amount > 0))
+	{
+		return false;
+	}
+
+	if (Amount > Credits)
+	{
+		return false;
+	}
 
 	Credits -= Amount;
 

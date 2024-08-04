@@ -18,5 +18,8 @@ public:
 	AMcHealthPotion();
 
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Credits")
+	int32 CreditsCost;
+
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 };

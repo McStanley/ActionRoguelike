@@ -9,6 +9,7 @@
 AMcHealthPotion::AMcHealthPotion()
 {
 	RespawnDelay = 2.5f;
+	CreditsCost = 1;
 }
 
 void AMcHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
@@ -19,13 +20,14 @@ void AMcHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 
 	if (AttributeComp && !AttributeComp->HasFullHealth())
 	{
-		AMcPlayerState* PlayerState = InstigatorPawn->GetPlayerState<AMcPlayerState>();
-		if (PlayerState && PlayerState->GetCredits() > 0)
+		if (AMcPlayerState* PlayerState = InstigatorPawn->GetPlayerState<AMcPlayerState>())
 		{
-			PlayerState->SpendCredits(this, 1);
-			AttributeComp->SetHealthToMax(this);
+			if (PlayerState->SpendCredits(this, CreditsCost))
+			{
+				AttributeComp->SetHealthToMax(this);
 
-			Deactivate();
+				Deactivate();
+			}
 		}
 	}
 }

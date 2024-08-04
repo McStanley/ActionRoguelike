@@ -18,5 +18,8 @@ public:
 	AMcCoin();
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "Credits")
+	int32 CreditsAward;
+	
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 };

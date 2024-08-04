@@ -20,6 +20,8 @@ AMcGameModeBase::AMcGameModeBase()
 	HealthPotionsQuantity = 4;
 
 	BotSpawnTimerInterval = 2.f;
+
+	KillAwardCredits = 1;
 }
 
 void AMcGameModeBase::StartPlay()
@@ -190,7 +192,7 @@ void AMcGameModeBase::OnActorKilled(AActor* VictimActor, AActor* KillerActor)
 		{
 			if (AMcPlayerState* State = Player->GetPlayerStateChecked<AMcPlayerState>())
 			{
-				State->AddCredits(VictimActor, 1);
+				State->AddCredits(VictimActor, KillAwardCredits);
 			}
 		}
 	}

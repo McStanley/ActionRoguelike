@@ -8,6 +8,7 @@
 AMcCoin::AMcCoin()
 {
 	RespawnDelay = 5.0f;
+	CreditsAward = 2;
 }
 
 void AMcCoin::Interact_Implementation(APawn* InstigatorPawn)
@@ -15,7 +16,7 @@ void AMcCoin::Interact_Implementation(APawn* InstigatorPawn)
 	AMcPlayerState* PlayerState = InstigatorPawn->GetPlayerState<AMcPlayerState>();
 	if (PlayerState)
 	{
-		PlayerState->AddCredits(this, 2);
+		PlayerState->AddCredits(this, CreditsAward);
 
 		Deactivate();
 	}
