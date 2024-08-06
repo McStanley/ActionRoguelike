@@ -56,7 +56,8 @@ protected:
 	void PrimaryInteract();
 
 	UFUNCTION()
-	void OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth, float Delta);
+	void OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth, float Delta,
+	                     bool bReflected);
 
 	virtual FVector GetPawnViewLocation() const override;
 

@@ -25,7 +25,8 @@ protected:
 	UMcAttributeComponent* AttributeComp;
 
 	UFUNCTION()
-	void OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth, float Delta);
+	void OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth, float Delta,
+	                     bool bReflected);
 
 	virtual void PostInitializeComponents() override;
 };

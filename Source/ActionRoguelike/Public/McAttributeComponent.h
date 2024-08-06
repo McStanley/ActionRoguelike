@@ -6,8 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "McAttributeComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, UMcAttributeComponent*,
-                                              OwningComp, float, NewHealth, float, Delta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnHealthChanged, AActor*, InstigatorActor, UMcAttributeComponent*,
+                                              OwningComp, float, NewHealth, float, Delta, bool, bReflected);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnRageChanged, AActor*, InstigatorActor, UMcAttributeComponent*,
                                               OwningComp, float, NewRage, float, NewRagePercent, float, Delta);
@@ -58,7 +58,7 @@ public:
 	FOnHealthChanged OnHealthChanged;
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	bool ApplyHealthChange(AActor* InstigatorActor, const float Delta);
+	bool ApplyHealthChange(AActor* InstigatorActor, const float Delta, const bool bReflected = false);
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool SetHealthToMax(AActor* InstigatorActor);

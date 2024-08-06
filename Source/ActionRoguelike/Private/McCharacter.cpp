@@ -132,7 +132,7 @@ void AMcCharacter::PrimaryInteract()
 }
 
 void AMcCharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth,
-                                   float Delta)
+                                   float Delta, bool bReflected)
 {
 	if (Delta < 0.f)
 	{

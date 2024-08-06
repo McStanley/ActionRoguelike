@@ -45,7 +45,7 @@ void AMcAICharacter::OnPawnSeen(APawn* Pawn)
 }
 
 void AMcAICharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth,
-                                     float Delta)
+                                     float Delta, bool bReflected)
 {
 	if (Delta < 0.f)
 	{
