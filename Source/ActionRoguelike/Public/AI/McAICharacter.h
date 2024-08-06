@@ -36,6 +36,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UMcWorldUserWidget> SpottedWidgetClass;
+
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParamName;
 
@@ -45,6 +48,8 @@ protected:
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth, float Delta,
 	                     bool bReflected);
+
+	AActor* GetTargetActor();
 
 	void SetTargetActor(AActor* NewTarget);
 

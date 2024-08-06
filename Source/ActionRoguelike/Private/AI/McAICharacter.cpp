@@ -39,9 +39,19 @@ void AMcAICharacter::PostInitializeComponents()
 
 void AMcAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	SetTargetActor(Pawn);
+	AActor* CurrentTarget = GetTargetActor();
+	if (CurrentTarget != Pawn)
+	{
+		SetTargetActor(Pawn);
 
-	DrawDebugString(GetWorld(), GetActorLocation(), "Player spotted", nullptr, FColor::White, 4.f, true);
+		UMcWorldUserWidget* SpottedWidget = CreateWidget<UMcWorldUserWidget>(GetWorld(), SpottedWidgetClass);
+		if (SpottedWidget)
+		{
+			SpottedWidget->AnchorActor = this;
+			SpottedWidget->WorldOffset = FVector(0, 0, 160.f);
+			SpottedWidget->AddToViewport();
+		}
+	}
 }
 
 void AMcAICharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponent* OwningComp, float NewHealth,
@@ -83,6 +93,18 @@ void AMcAICharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeCompon
 			SetLifeSpan(10.f);
 		}
 	}
+}
+
+AActor* AMcAICharacter::GetTargetActor()
+{
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (AIController)
+	{
+		AActor* TargetActor = Cast<AActor>(AIController->GetBlackboardComponent()->GetValueAsObject("TargetActor"));
+		return TargetActor;
+	}
+
+	return nullptr;
 }
 
 void AMcAICharacter::SetTargetActor(AActor* NewTarget)
