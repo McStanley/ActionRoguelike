@@ -43,6 +43,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Level")
 	TSubclassOf<AActor> HealthPotionClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Level")
+	int32 TeleportPickUpsQuantity;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Level")
+	TSubclassOf<AActor> TeleportPickUpClass;
+
 	FTimerHandle TimerHandle_SpawnBots;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")

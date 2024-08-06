@@ -25,6 +25,9 @@ public:
 	void RemoveAction(UMcAction* Action);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")
+	bool HasAction(TSubclassOf<UMcAction> ActionClass);
+
+	UFUNCTION(BlueprintCallable, Category = "Actions")
 	bool StartActionByName(AActor* Instigator, FName ActionName);
 
 	UFUNCTION(BlueprintCallable, Category = "Actions")

@@ -51,6 +51,19 @@ void UMcActionComponent::RemoveAction(UMcAction* Action)
 	}
 }
 
+bool UMcActionComponent::HasAction(TSubclassOf<UMcAction> ActionClass)
+{
+	for (UMcAction* Action : Actions)
+	{
+		if (Action->ActionName == ActionClass.GetDefaultObject()->ActionName)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool UMcActionComponent::StartActionByName(AActor* Instigator, const FName ActionName)
 {
 	for (UMcAction* Action : Actions)

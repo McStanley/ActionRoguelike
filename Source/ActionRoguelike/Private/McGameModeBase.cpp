@@ -18,6 +18,7 @@ AMcGameModeBase::AMcGameModeBase()
 {
 	CoinsQuantity = 3;
 	HealthPotionsQuantity = 4;
+	TeleportPickUpsQuantity = 2;
 
 	BotSpawnTimerInterval = 2.f;
 
@@ -63,42 +64,54 @@ void AMcGameModeBase::OnPickUpQueryCompleted(UEnvQueryInstanceBlueprintWrapper* 
 
 	TArray<int> Indices;
 
-	const int32 ItemsQuantity = CoinsQuantity + HealthPotionsQuantity;
-
-	int32 CoinsSpawned = 0;
-	int32 HealthPotionsSpawned = 0;
-
-	while (Indices.Num() < ItemsQuantity && Indices.Num() < LocationsSize)
+	struct FPickUp
 	{
-		int32 RandIndex = FMath::RandRange(0, LocationsSize - 1);
+		TSubclassOf<AActor> Class;
+		int32 RequestedQuantity;
+		int32 CurrentQuantity;
+		FVector3d Offset;
+	};
 
-		if (Indices.Contains(RandIndex)) continue;
+	FPickUp PickUps[] = {
+		{CoinClass, CoinsQuantity, 0, FVector3d::ZeroVector},
+		{HealthPotionClass, HealthPotionsQuantity, 0, FVector3d(0.f, 0.f, -30.f)},
+		{TeleportPickUpClass, TeleportPickUpsQuantity, 0, FVector3d::ZeroVector}
+	};
+	constexpr int32 PickUpsLength = sizeof(PickUps) / sizeof(FPickUp);
 
-		Indices.Add(RandIndex);
 
-		const bool bAllCoinsSpawned = CoinsSpawned >= CoinsQuantity;
-		const bool bAllHealthPotionsSpawned = HealthPotionsSpawned >= HealthPotionsQuantity;
+	int32 RequestedQuantity = 0;
 
-		const bool bPreferCoin = FMath::RandBool();
+	for (int i = 0; i < PickUpsLength; i++)
+	{
+		RequestedQuantity += PickUps[i].RequestedQuantity;
+	}
 
-		const bool bSpawnCoin = (!bAllCoinsSpawned && bPreferCoin) || bAllHealthPotionsSpawned;
+	while (Indices.Num() < RequestedQuantity && Indices.Num() < LocationsSize)
+	{
+		int32 LocationIndex = FMath::RandRange(0, LocationsSize - 1);
 
-		// UE_LOG(LogTemp, Type::Display, TEXT("bSpawnCoin: %d"), bSpawnCoin);
+		if (Indices.Contains(LocationIndex)) continue;
 
-		TSubclassOf<AActor> ClassToSpawn = bSpawnCoin ? CoinClass : HealthPotionClass;
-		int32* XSpawned = bSpawnCoin ? &CoinsSpawned : &HealthPotionsSpawned;
+		Indices.Add(LocationIndex);
 
-		FVector Location = Locations[RandIndex];
+		FPickUp* SelectedPickUp;
 
-		// Adjust health potion vertical offset
-		if (!bSpawnCoin)
+		do
 		{
-			Location += FVector(0.f, 0.f, -30.f);
+			const int32 PickUpIndex = FMath::RandRange(0, PickUpsLength - 1);
+			SelectedPickUp = &PickUps[PickUpIndex];
 		}
+		while (SelectedPickUp->CurrentQuantity >= SelectedPickUp->RequestedQuantity);
+
+		TSubclassOf<AActor> ClassToSpawn = SelectedPickUp->Class;
+
+		FVector Location = Locations[LocationIndex];
+		Location += SelectedPickUp->Offset;
 
 		GetWorld()->SpawnActor<AActor>(ClassToSpawn, Location, FRotator::ZeroRotator);
 
-		*XSpawned += 1;;
+		SelectedPickUp->CurrentQuantity += 1;;
 	}
 }
 
