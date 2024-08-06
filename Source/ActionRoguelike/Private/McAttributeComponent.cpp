@@ -9,6 +9,16 @@ static TAutoConsoleVariable<float> CVarDamageMultiplier(
 	TEXT("mc.DamageMultiplier"), 1.0f, TEXT("Global damage multiplier for Attribute Component."), ECVF_Cheat
 );
 
+// Sets default values for this component's properties
+UMcAttributeComponent::UMcAttributeComponent()
+{
+	Health = 100;
+	HealthMax = 100;
+
+	Rage = 0;
+	RageMax = 30;
+}
+
 UMcAttributeComponent* UMcAttributeComponent::GetAttributeComponent(AActor* FromActor)
 {
 	if (FromActor == nullptr)
@@ -28,13 +38,6 @@ bool UMcAttributeComponent::IsActorAlive(AActor* Actor)
 	}
 
 	return AttributeComp->IsALive();
-}
-
-// Sets default values for this component's properties
-UMcAttributeComponent::UMcAttributeComponent()
-{
-	Health = 100;
-	HealthMax = 100;
 }
 
 bool UMcAttributeComponent::IsALive() const
@@ -79,12 +82,17 @@ bool UMcAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 
 	OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);
 
-	if (ActualDelta < 0.f && Health == 0.f)
+	if (ActualDelta < 0.f)
 	{
-		AMcGameModeBase* GM = GetWorld()->GetAuthGameMode<AMcGameModeBase>();
-		if (GM)
+		ApplyRageChange(InstigatorActor, -ActualDelta);
+
+		if (Health == 0.f)
 		{
-			GM->OnActorKilled(GetOwner(), InstigatorActor);
+			AMcGameModeBase* GM = GetWorld()->GetAuthGameMode<AMcGameModeBase>();
+			if (GM)
+			{
+				GM->OnActorKilled(GetOwner(), InstigatorActor);
+			}
 		}
 	}
 
@@ -110,4 +118,35 @@ bool UMcAttributeComponent::SetHealthToMax(AActor* InstigatorActor)
 bool UMcAttributeComponent::Kill(AActor* InstigatorActor)
 {
 	return ApplyHealthChange(InstigatorActor, -HealthMax);
+}
+
+float UMcAttributeComponent::GetRage() const
+{
+	return Rage;
+}
+
+float UMcAttributeComponent::GetRagePercent() const
+{
+	return Rage / RageMax;
+}
+
+bool UMcAttributeComponent::HasFullRage() const
+{
+	return Rage == RageMax;
+}
+
+bool UMcAttributeComponent::ApplyRageChange(AActor* InstigatorActor, const float Damage)
+{
+	const float OldRage = Rage;
+	Rage = FMath::Clamp(Rage + Damage, 0, RageMax);
+
+	if (Rage == OldRage)
+	{
+		return false;
+	}
+
+	const float Delta = Rage - OldRage;
+	OnRageChanged.Broadcast(InstigatorActor, this, Rage, GetRagePercent(), Delta);
+
+	return true;
 }
