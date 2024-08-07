@@ -17,7 +17,7 @@ class ACTIONROGUELIKE_API UMcWorldUserWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, Category = "UI")
+	UPROPERTY(BlueprintReadWrite, Category = "UI", meta = (ExposeOnSpawn = true))
 	AActor* AnchorActor;
 
 	UPROPERTY(EditAnywhere, Category = "UI")

@@ -4,6 +4,7 @@
 #include "McAttributeComponent.h"
 
 #include "McGameModeBase.h"
+#include "Net/UnrealNetwork.h"
 
 static TAutoConsoleVariable<float> CVarDamageMultiplier(
 	TEXT("mc.DamageMultiplier"), 1.0f, TEXT("Global damage multiplier for Attribute Component."), ECVF_Cheat
@@ -17,6 +18,8 @@ UMcAttributeComponent::UMcAttributeComponent()
 
 	Rage = 0;
 	RageMax = 30;
+
+	SetIsReplicatedByDefault(true);
 }
 
 UMcAttributeComponent* UMcAttributeComponent::GetAttributeComponent(AActor* FromActor)
@@ -80,7 +83,10 @@ bool UMcAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 
 	const float ActualDelta = Health - OldHealth;
 
-	OnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta, bReflected);
+	if (ActualDelta != 0.f)
+	{
+		MulticastHealthChanged(InstigatorActor, Health, ActualDelta, bReflected);
+	}
 
 	if (ActualDelta < 0.f)
 	{
@@ -113,6 +119,12 @@ bool UMcAttributeComponent::SetHealthToMax(AActor* InstigatorActor)
 	OnHealthChanged.Broadcast(InstigatorActor, this, Health, Delta, false);
 
 	return true;
+}
+
+void UMcAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta,
+                                                                  bool bReflected)
+{
+	OnHealthChanged.Broadcast(InstigatorActor, this, NewHealth, Delta, bReflected);
 }
 
 bool UMcAttributeComponent::Kill(AActor* InstigatorActor)
@@ -149,4 +161,12 @@ bool UMcAttributeComponent::ApplyRageChange(AActor* InstigatorActor, const float
 	OnRageChanged.Broadcast(InstigatorActor, this, Rage, GetRagePercent(), Delta);
 
 	return true;
+}
+
+void UMcAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UMcAttributeComponent, Health);
+	DOREPLIFETIME(UMcAttributeComponent, HealthMax);
 }

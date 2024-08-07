@@ -10,6 +10,8 @@ AMcRespawningPickUp::AMcRespawningPickUp()
 	RootComponent = MeshComp;
 
 	RespawnDelay = 5.0f;
+
+	bReplicates = true;
 }
 
 void AMcRespawningPickUp::Deactivate()

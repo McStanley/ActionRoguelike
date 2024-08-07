@@ -8,6 +8,8 @@
 UMcActionComponent::UMcActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+	SetIsReplicatedByDefault(true);
 }
 
 void UMcActionComponent::BeginPlay()
@@ -75,12 +77,22 @@ bool UMcActionComponent::StartActionByName(AActor* Instigator, const FName Actio
 				continue;
 			}
 
+			if (!GetOwner()->HasAuthority())
+			{
+				ServerStartAction(Instigator, ActionName);
+			}
+
 			Action->StartAction(Instigator);
 			return true;
 		}
 	}
 
 	return false;
+}
+
+void UMcActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
+{
+	StartActionByName(Instigator, ActionName);
 }
 
 bool UMcActionComponent::StopActionByName(AActor* Instigator, const FName ActionName)

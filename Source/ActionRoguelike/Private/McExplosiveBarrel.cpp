@@ -22,13 +22,18 @@ AMcExplosiveBarrel::AMcExplosiveBarrel()
 	RadialForceComp->ImpulseStrength = 2000.0f;
 	RadialForceComp->bImpulseVelChange = true;
 	RadialForceComp->SetupAttachment(RootComponent);
+
+	bReplicates = true;
 }
 
 void AMcExplosiveBarrel::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	StaticMeshComp->OnComponentHit.AddDynamic(this, &AMcExplosiveBarrel::Explode);
+	if (HasAuthority())
+	{
+		StaticMeshComp->OnComponentHit.AddDynamic(this, &AMcExplosiveBarrel::Explode);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -49,11 +54,20 @@ void AMcExplosiveBarrel::Explode(UPrimitiveComponent* HitComponent,
                                  FVector NormalImpulse,
                                  const FHitResult& Hit)
 {
-	RadialForceComp->FireImpulse();
+	MulticastExplode();
+	SetLifeSpan(3.0f);
+
 
 	UE_LOG(LogTemp, Log, TEXT("Explosion (Explosive Barrel C++)"));
 	UE_LOG(LogTemp, Warning, TEXT("OtherActor: %s at game time %f"), *GetNameSafe(OtherActor), GetWorld()->TimeSeconds);
 
 	const FString DebugString = FString::Printf(TEXT("Hit at location: %s"), *Hit.ImpactPoint.ToString());
 	DrawDebugString(GetWorld(), Hit.ImpactPoint, DebugString, nullptr, FColor::Green, 2.f, true);
+}
+
+void AMcExplosiveBarrel::MulticastExplode_Implementation()
+{
+	RadialForceComp->FireImpulse();
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(false);
 }

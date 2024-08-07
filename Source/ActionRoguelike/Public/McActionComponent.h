@@ -43,6 +43,9 @@ protected:
 	UPROPERTY()
 	TArray<TObjectPtr<UMcAction>> Actions;
 
+	UFUNCTION(Server, Reliable)
+	void ServerStartAction(AActor* Instigator, FName ActionName);
+
 	virtual void BeginPlay() override;
 
 public:
