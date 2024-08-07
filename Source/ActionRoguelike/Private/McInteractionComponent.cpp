@@ -34,7 +34,11 @@ void UMcInteractionComponent::TickComponent(float DeltaTime,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FindBestTarget();
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if (OwnerPawn->IsLocallyControlled())
+	{
+		FindBestTarget();
+	}
 }
 
 void UMcInteractionComponent::FindBestTarget()
@@ -127,11 +131,16 @@ void UMcInteractionComponent::FindBestTarget()
 
 void UMcInteractionComponent::PrimaryInteract()
 {
-	if (TargetActor == nullptr)
+	ServerInteract(TargetActor);
+}
+
+void UMcInteractionComponent::ServerInteract_Implementation(AActor* InTarget)
+{
+	if (InTarget == nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "No TargetActor to interact with.");
 		return;
 	}
 
-	IMcGameplayInterface::Execute_Interact(TargetActor, Cast<APawn>(GetOwner()));
+	IMcGameplayInterface::Execute_Interact(InTarget, Cast<APawn>(GetOwner()));
 }

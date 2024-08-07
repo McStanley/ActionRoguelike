@@ -3,6 +3,8 @@
 
 #include "McItemChest.h"
 
+#include "Net/UnrealNetwork.h"
+
 // Sets default values
 AMcItemChest::AMcItemChest()
 {
@@ -16,6 +18,15 @@ AMcItemChest::AMcItemChest()
 	LidMesh->SetupAttachment(RootComponent);
 
 	TargetPitch = 110.0;
+
+	bReplicates = true;
+}
+
+void AMcItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMcItemChest, bLidOpened);
 }
 
 // Called when the game starts or when spawned
@@ -32,5 +43,12 @@ void AMcItemChest::Tick(float DeltaTime)
 
 void AMcItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
-	LidMesh->SetRelativeRotation(FRotator(TargetPitch, 0, 0));
+	bLidOpened = !bLidOpened;
+	OnRep_LidOpened();
+}
+
+void AMcItemChest::OnRep_LidOpened()
+{
+	float NewPitch = bLidOpened ? TargetPitch : 0.f;
+	LidMesh->SetRelativeRotation(FRotator(NewPitch, 0, 0));
 }

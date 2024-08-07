@@ -24,6 +24,9 @@ protected:
 
 	void FindBestTarget();
 
+	UFUNCTION(Server, Reliable)
+	void ServerInteract(AActor* InTarget);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Trace")
 	float TraceDistance;
 
