@@ -53,5 +53,8 @@ protected:
 
 	void SetTargetActor(AActor* NewTarget);
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastCreateSpottedWidget();
+
 	virtual void PostInitializeComponents() override;
 };

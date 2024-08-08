@@ -44,13 +44,7 @@ void AMcAICharacter::OnPawnSeen(APawn* Pawn)
 	{
 		SetTargetActor(Pawn);
 
-		UMcWorldUserWidget* SpottedWidget = CreateWidget<UMcWorldUserWidget>(GetWorld(), SpottedWidgetClass);
-		if (SpottedWidget)
-		{
-			SpottedWidget->AnchorActor = this;
-			SpottedWidget->WorldOffset = FVector(0, 0, 160.f);
-			SpottedWidget->AddToViewport();
-		}
+		MulticastCreateSpottedWidget();
 	}
 }
 
@@ -113,5 +107,16 @@ void AMcAICharacter::SetTargetActor(AActor* NewTarget)
 	if (AIController)
 	{
 		AIController->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);
+	}
+}
+
+void AMcAICharacter::MulticastCreateSpottedWidget_Implementation()
+{
+	UMcWorldUserWidget* SpottedWidget = CreateWidget<UMcWorldUserWidget>(GetWorld(), SpottedWidgetClass);
+	if (SpottedWidget)
+	{
+		SpottedWidget->AnchorActor = this;
+		SpottedWidget->WorldOffset = FVector(0, 0, 160.f);
+		SpottedWidget->AddToViewport(1);
 	}
 }
