@@ -6,8 +6,8 @@
 #include "GameFramework/PlayerState.h"
 #include "McPlayerState.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnCreditsChanged, AActor*, InstigatorActor, AMcPlayerState*,
-                                              OwningState, int32, NewCredits, int32, Delta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnCreditsChanged, AActor*, InstigatorActor, AMcPlayerState*, OwningState,
+                                              int32, NewCredits, int32, Delta);
 
 /**
  * 
@@ -36,4 +36,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "State")
 	bool SpendCredits(AActor* InstigatorActor, int32 Amount);
+
+	UFUNCTION(Client, Reliable)
+	void ClientCreditsChanged(AActor* InstigatorActor, int32 NewCredits, int32 Delta);
 };

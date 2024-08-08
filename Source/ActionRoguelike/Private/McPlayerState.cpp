@@ -22,7 +22,7 @@ bool AMcPlayerState::AddCredits(AActor* InstigatorActor, int32 Amount)
 
 	Credits += Amount;
 
-	OnCreditsChanged.Broadcast(InstigatorActor, this, Credits, Amount);
+	ClientCreditsChanged(InstigatorActor, Credits, Amount);
 
 	return true;
 }
@@ -41,7 +41,12 @@ bool AMcPlayerState::SpendCredits(AActor* InstigatorActor, int32 Amount)
 
 	Credits -= Amount;
 
-	OnCreditsChanged.Broadcast(InstigatorActor, this, Credits, -Amount);
+	ClientCreditsChanged(InstigatorActor, Credits, -Amount);
 
 	return true;
+}
+
+void AMcPlayerState::ClientCreditsChanged_Implementation(AActor* InstigatorActor, int32 NewCredits, int32 Delta)
+{
+	OnCreditsChanged.Broadcast(InstigatorActor, this, NewCredits, Delta);
 }
