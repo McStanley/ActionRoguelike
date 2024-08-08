@@ -24,7 +24,17 @@ protected:
 
 	float RespawnDelay;
 
+	UPROPERTY(ReplicatedUsing="OnRep_Active")
+	bool bActive;
+
 	void Deactivate();
 
 	void Activate();
+
+	UFUNCTION()
+	void OnRep_Active();
+
+	void HandleDeactivate();
+
+	void HandleActivate();
 };

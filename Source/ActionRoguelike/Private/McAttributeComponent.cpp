@@ -116,7 +116,7 @@ bool UMcAttributeComponent::SetHealthToMax(AActor* InstigatorActor)
 
 	Health = HealthMax;
 
-	OnHealthChanged.Broadcast(InstigatorActor, this, Health, Delta, false);
+	MulticastHealthChanged(InstigatorActor, Health, Delta, false);
 
 	return true;
 }
