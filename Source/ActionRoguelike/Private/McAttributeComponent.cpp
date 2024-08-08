@@ -158,9 +158,15 @@ bool UMcAttributeComponent::ApplyRageChange(AActor* InstigatorActor, const float
 	}
 
 	const float Delta = Rage - OldRage;
-	OnRageChanged.Broadcast(InstigatorActor, this, Rage, GetRagePercent(), Delta);
+	MulticastRageChanged(InstigatorActor, Rage, GetRagePercent(), Delta);
 
 	return true;
+}
+
+void UMcAttributeComponent::MulticastRageChanged_Implementation(AActor* InstigatorActor, float NewRage,
+                                                                float NewRagePercent, float Delta)
+{
+	OnRageChanged.Broadcast(InstigatorActor, this, NewRage, NewRagePercent, Delta);
 }
 
 void UMcAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -169,4 +175,7 @@ void UMcAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 
 	DOREPLIFETIME(UMcAttributeComponent, Health);
 	DOREPLIFETIME(UMcAttributeComponent, HealthMax);
+
+	DOREPLIFETIME(UMcAttributeComponent, Rage);
+	DOREPLIFETIME(UMcAttributeComponent, RageMax);
 }
