@@ -4,6 +4,13 @@
 #include "McAction.h"
 
 #include "McActionComponent.h"
+#include "ActionRoguelike/ActionRoguelike.h"
+#include "Net/UnrealNetwork.h"
+
+bool UMcAction::IsSupportedForNetworking() const
+{
+	return true;
+}
 
 bool UMcAction::CanStart_Implementation(AActor* Instigator)
 {
@@ -23,26 +30,28 @@ bool UMcAction::CanStart_Implementation(AActor* Instigator)
 void UMcAction::StartAction_Implementation(AActor* Instigator)
 {
 	UE_LOG(LogTemp, Log, TEXT("Starting: %s"), *GetNameSafe(this));
+	// LogOnScreen(this, FString::Printf(TEXT("Starting: %s"), *ActionName.ToString()), FColor::Emerald);
 
 	GetOwningComponent()->ActiveGameplayTags.AppendTags(GrantsTags);
 
-	bIsRunning = true;
+	RepData.Instigator = Instigator;
+	RepData.bIsRunning = true;
 }
 
 void UMcAction::StopAction_Implementation(AActor* Instigator)
 {
-	ensureAlways(bIsRunning);
-
 	UE_LOG(LogTemp, Log, TEXT("Stopping: %s"), *GetNameSafe(this));
+	// LogOnScreen(this, FString::Printf(TEXT("Stopping: %s"), *ActionName.ToString()), FColor::Red);
 
 	GetOwningComponent()->ActiveGameplayTags.RemoveTags(GrantsTags);
 
-	bIsRunning = false;
+	RepData.Instigator = Instigator;
+	RepData.bIsRunning = false;
 }
 
 bool UMcAction::IsRunning() const
 {
-	return bIsRunning;
+	return RepData.bIsRunning;
 }
 
 UWorld* UMcAction::GetWorld() const
@@ -56,7 +65,26 @@ UWorld* UMcAction::GetWorld() const
 	return nullptr;
 }
 
+void UMcAction::OnRep_RepData()
+{
+	if (RepData.bIsRunning)
+	{
+		StartAction(RepData.Instigator);
+	}
+	else
+	{
+		StopAction(RepData.Instigator);
+	}
+}
+
 UMcActionComponent* UMcAction::GetOwningComponent() const
 {
 	return Cast<UMcActionComponent>(GetOuter());
+}
+
+void UMcAction::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UMcAction, RepData);
 }

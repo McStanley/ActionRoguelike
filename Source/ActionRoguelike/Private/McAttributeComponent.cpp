@@ -77,27 +77,31 @@ bool UMcAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 	}
 
 	const float OldHealth = Health;
+	const float NewHealth = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 
-	const float NewHealth = Health + Delta;
-	Health = FMath::Clamp(NewHealth, 0, HealthMax);
+	const float ActualDelta = NewHealth - OldHealth;
 
-	const float ActualDelta = Health - OldHealth;
 
-	if (ActualDelta != 0.f)
+	if (GetOwner()->HasAuthority())
 	{
-		MulticastHealthChanged(InstigatorActor, Health, ActualDelta, bReflected);
-	}
+		Health = NewHealth;
 
-	if (ActualDelta < 0.f)
-	{
-		ApplyRageChange(InstigatorActor, -ActualDelta);
-
-		if (Health == 0.f)
+		if (ActualDelta != 0.f)
 		{
-			AMcGameModeBase* GM = GetWorld()->GetAuthGameMode<AMcGameModeBase>();
-			if (GM)
+			MulticastHealthChanged(InstigatorActor, Health, ActualDelta, bReflected);
+		}
+
+		if (ActualDelta < 0.f)
+		{
+			ApplyRageChange(InstigatorActor, -ActualDelta);
+
+			if (Health == 0.f)
 			{
-				GM->OnActorKilled(GetOwner(), InstigatorActor);
+				AMcGameModeBase* GM = GetWorld()->GetAuthGameMode<AMcGameModeBase>();
+				if (GM)
+				{
+					GM->OnActorKilled(GetOwner(), InstigatorActor);
+				}
 			}
 		}
 	}

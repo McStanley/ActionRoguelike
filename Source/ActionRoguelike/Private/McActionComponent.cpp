@@ -4,6 +4,9 @@
 #include "McActionComponent.h"
 
 #include "McAction.h"
+#include "ActionRoguelike/ActionRoguelike.h"
+#include "Engine/ActorChannel.h"
+#include "Net/UnrealNetwork.h"
 
 UMcActionComponent::UMcActionComponent()
 {
@@ -12,13 +15,23 @@ UMcActionComponent::UMcActionComponent()
 	SetIsReplicatedByDefault(true);
 }
 
+void UMcActionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UMcActionComponent, Actions);
+}
+
 void UMcActionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (TSubclassOf<UMcAction> ActionClass : DefaultActions)
+	if (GetOwner()->HasAuthority())
 	{
-		AddAction(GetOwner(), ActionClass);
+		for (TSubclassOf<UMcAction> ActionClass : DefaultActions)
+		{
+			AddAction(GetOwner(), ActionClass);
+		}
 	}
 }
 
@@ -27,11 +40,40 @@ void UMcActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                        FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// for (UMcAction* Action : Actions)
+	// {
+	// 	FColor TextColor = Action->IsRunning() ? FColor::Emerald : FColor::White;
+	// 	FString Message = FString::Printf(TEXT("[%s] Action: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
+	//
+	// 	LogOnScreen(this, Message, TextColor, 0.f);
+	// }
+}
+
+bool UMcActionComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
+{
+	bool bWroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+
+	for (UMcAction* Action : Actions)
+	{
+		if (Action)
+		{
+			bWroteSomething |= Channel->ReplicateSubobject(Action, *Bunch, *RepFlags);
+		}
+	}
+
+	return bWroteSomething;
 }
 
 void UMcActionComponent::AddAction(AActor* Instigator, TSubclassOf<UMcAction> ActionClass)
 {
 	if (!ensure(ActionClass)) return;
+
+	if (!GetOwner()->HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client attempted to AddAction. (ActionClass: %s)"), *GetNameSafe(ActionClass))
+		return;
+	}
 
 	UMcAction* NewAction = NewObject<UMcAction>(this, ActionClass);
 	if (ensure(NewAction))
@@ -103,6 +145,11 @@ bool UMcActionComponent::StopActionByName(AActor* Instigator, const FName Action
 		{
 			if (Action->IsRunning())
 			{
+				if (!GetOwner()->HasAuthority())
+				{
+					ServerStopAction(Instigator, ActionName);
+				}
+
 				Action->StopAction(Instigator);
 				return true;
 			}
@@ -110,4 +157,9 @@ bool UMcActionComponent::StopActionByName(AActor* Instigator, const FName Action
 	}
 
 	return false;
+}
+
+void UMcActionComponent::ServerStopAction_Implementation(AActor* Instigator, FName ActionName)
+{
+	StopActionByName(Instigator, ActionName);
 }

@@ -143,6 +143,7 @@ void AMcCharacter::OnHealthChanged(AActor* InstigatorActor, UMcAttributeComponen
 			APlayerController* PC = Cast<APlayerController>(GetController());
 
 			DisableInput(PC);
+			SetLifeSpan(10.f);
 		}
 	}
 }

@@ -30,11 +30,14 @@ void UMcAction_ProjectileCast::StartAction_Implementation(AActor* Instigator)
 		Character->PlayAnimMontage(CastingAnim);
 	}
 
-	FTimerHandle TimerHandle;
-	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindUFunction(this, FName("TimerCallback"), Character);
+	if (Character->HasAuthority())
+	{
+		FTimerHandle TimerHandle;
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUFunction(this, FName("TimerCallback"), Character);
 
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, SpawnDelay, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, SpawnDelay, false);
+	}
 }
 
 void UMcAction_ProjectileCast::TimerCallback(ACharacter* Character)
