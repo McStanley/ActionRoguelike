@@ -22,11 +22,13 @@ class ACTIONROGUELIKE_API AMcPlayerState : public APlayerState
 public:
 	AMcPlayerState();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnCreditsChanged OnCreditsChanged;
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "State")
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = "State")
 	int32 Credits;
 
 public:

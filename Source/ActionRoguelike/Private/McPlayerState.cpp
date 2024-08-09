@@ -4,10 +4,18 @@
 #include "McPlayerState.h"
 
 #include "McSaveGame.h"
+#include "Net/UnrealNetwork.h"
 
 AMcPlayerState::AMcPlayerState()
 {
 	Credits = 0;
+}
+
+void AMcPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMcPlayerState, Credits);
 }
 
 int32 AMcPlayerState::GetCredits() const
