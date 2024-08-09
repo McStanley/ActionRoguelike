@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "McGameModeBase.generated.h"
 
+class UMcSaveGame;
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 
@@ -25,9 +26,16 @@ class ACTIONROGUELIKE_API AMcGameModeBase : public AGameModeBase
 public:
 	AMcGameModeBase();
 
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
 	virtual void StartPlay() override;
 
 protected:
+	FString SaveGameSlotName;
+
+	UPROPERTY()
+	UMcSaveGame* SaveGame = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Level")
 	UEnvQuery* PickUpQuery = nullptr;
 
@@ -83,4 +91,11 @@ public:
 
 	UFUNCTION(Exec)
 	void KillAllAI();
+
+	void LoadSaveGame();
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void WriteSaveGame();
+
+	void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 };

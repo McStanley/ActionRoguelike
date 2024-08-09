@@ -3,6 +3,8 @@
 
 #include "McPlayerState.h"
 
+#include "McSaveGame.h"
+
 AMcPlayerState::AMcPlayerState()
 {
 	Credits = 0;
@@ -49,4 +51,21 @@ bool AMcPlayerState::SpendCredits(AActor* InstigatorActor, int32 Amount)
 void AMcPlayerState::ClientCreditsChanged_Implementation(AActor* InstigatorActor, int32 NewCredits, int32 Delta)
 {
 	OnCreditsChanged.Broadcast(InstigatorActor, this, NewCredits, Delta);
+}
+
+void AMcPlayerState::Save_Implementation(UMcSaveGame* SaveGame)
+{
+	if (SaveGame)
+	{
+		SaveGame->Credits = Credits;
+	}
+}
+
+void AMcPlayerState::Load_Implementation(UMcSaveGame* SaveGame)
+{
+	if (SaveGame)
+	{
+		// Credits = SaveGame->Credits;
+		AddCredits(nullptr, SaveGame->Credits);
+	}
 }

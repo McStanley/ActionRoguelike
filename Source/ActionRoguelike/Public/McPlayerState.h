@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerState.h"
 #include "McPlayerState.generated.h"
 
+class UMcSaveGame;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnCreditsChanged, AActor*, InstigatorActor, AMcPlayerState*, OwningState,
                                               int32, NewCredits, int32, Delta);
 
@@ -39,4 +41,10 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ClientCreditsChanged(AActor* InstigatorActor, int32 NewCredits, int32 Delta);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void Save(UMcSaveGame* SaveGame);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void Load(UMcSaveGame* SaveGame);
 };

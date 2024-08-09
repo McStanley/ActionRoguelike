@@ -6,9 +6,14 @@
 #include "EngineUtils.h"
 #include "McAttributeComponent.h"
 #include "McCharacter.h"
+#include "McGameplayInterface.h"
 #include "McPlayerState.h"
+#include "McSaveGame.h"
 #include "AI/McAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
+#include "GameFramework/GameStateBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(
 	TEXT("mc.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat
@@ -16,6 +21,8 @@ static TAutoConsoleVariable<bool> CVarSpawnBots(
 
 AMcGameModeBase::AMcGameModeBase()
 {
+	SaveGameSlotName = "McSaveGame01";
+
 	CoinsQuantity = 3;
 	HealthPotionsQuantity = 4;
 	TeleportPickUpsQuantity = 2;
@@ -23,6 +30,13 @@ AMcGameModeBase::AMcGameModeBase()
 	BotSpawnTimerInterval = 2.f;
 
 	KillAwardCredits = 1;
+}
+
+void AMcGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	LoadSaveGame();
 }
 
 void AMcGameModeBase::StartPlay()
@@ -236,4 +250,104 @@ void AMcGameModeBase::KillAllAI()
 			AttributeComp->Kill(this);
 		}
 	}
+}
+
+void AMcGameModeBase::LoadSaveGame()
+{
+	if (UGameplayStatics::DoesSaveGameExist(SaveGameSlotName, 0))
+	{
+		SaveGame = Cast<UMcSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameSlotName, 0));
+
+		if (SaveGame == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame data."));
+			return;
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Loaded SaveGame data."));
+
+		for (FActorIterator It(GetWorld()); It; ++It)
+		{
+			AActor* Actor = *It;
+			if (!Actor->Implements<UMcGameplayInterface>())
+			{
+				continue;
+			}
+
+			for (FActorSaveData ActorData : SaveGame->SavedActors)
+			{
+				if (ActorData.Name == Actor->GetName())
+				{
+					Actor->SetActorTransform(ActorData.Transform);
+
+					FMemoryReader MemoryReader(ActorData.ByteData);
+
+					FObjectAndNameAsStringProxyArchive Ar(MemoryReader, true);
+					Ar.ArIsSaveGame = true;
+
+					Actor->Serialize(Ar);
+
+					IMcGameplayInterface::Execute_OnActorStateLoaded(Actor);
+
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		SaveGame = Cast<UMcSaveGame>(UGameplayStatics::CreateSaveGameObject(UMcSaveGame::StaticClass()));
+
+		UE_LOG(LogTemp, Log, TEXT("Created new SaveGame object."));
+	}
+}
+
+void AMcGameModeBase::WriteSaveGame()
+{
+	for (int i = 0; i < GameState->PlayerArray.Num(); i++)
+	{
+		AMcPlayerState* PlayerState = Cast<AMcPlayerState>(GameState->PlayerArray[i]);
+		if (PlayerState)
+		{
+			PlayerState->Save(SaveGame);
+			break;
+		}
+	}
+
+	SaveGame->SavedActors.Empty();
+
+	for (FActorIterator It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor->Implements<UMcGameplayInterface>())
+		{
+			continue;
+		}
+
+		FActorSaveData ActorData;
+		ActorData.Name = Actor->GetName();
+		ActorData.Transform = Actor->GetActorTransform();
+
+		FMemoryWriter MemoryWriter(ActorData.ByteData);
+
+		FObjectAndNameAsStringProxyArchive Ar(MemoryWriter, true);
+		Ar.ArIsSaveGame = true;
+
+		Actor->Serialize(Ar);
+
+		SaveGame->SavedActors.Add(ActorData);
+	}
+
+	UGameplayStatics::SaveGameToSlot(SaveGame, SaveGameSlotName, 0);
+}
+
+void AMcGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	AMcPlayerState* PlayerState = NewPlayer->GetPlayerState<AMcPlayerState>();
+	if (PlayerState)
+	{
+		PlayerState->Load(SaveGame);
+	}
+
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 }

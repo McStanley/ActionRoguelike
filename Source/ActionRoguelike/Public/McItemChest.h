@@ -16,6 +16,8 @@ public:
 	// Sets default values for this actor's properties
 	AMcItemChest();
 
+	void OnActorStateLoaded_Implementation() override;
+
 	UPROPERTY(EditAnywhere)
 	float TargetPitch;
 
@@ -25,7 +27,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(ReplicatedUsing="OnRep_LidOpened")
+	UPROPERTY(ReplicatedUsing="OnRep_LidOpened", SaveGame)
 	bool bLidOpened;
 
 	UFUNCTION()

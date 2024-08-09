@@ -22,6 +22,11 @@ AMcItemChest::AMcItemChest()
 	bReplicates = true;
 }
 
+void AMcItemChest::OnActorStateLoaded_Implementation()
+{
+	OnRep_LidOpened();
+}
+
 void AMcItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
