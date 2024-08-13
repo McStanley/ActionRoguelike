@@ -5,6 +5,7 @@
 
 #include "EngineUtils.h"
 #include "McAttributeComponent.h"
+#include "McBotData.h"
 #include "McCharacter.h"
 #include "McGameplayInterface.h"
 #include "McPlayerState.h"
@@ -188,12 +189,19 @@ void AMcGameModeBase::OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Que
 	TArray<FVector> Locations;
 	const bool bValidResult = QueryInstance->GetQueryResultsAsLocations(Locations);
 
-	if (bValidResult)
+	if (bValidResult && BotTypesTable)
 	{
+		TArray<FBotInfoRow*> Rows;
+		BotTypesTable->GetAllRows("", Rows);
+
+		int32 RandomIndex = FMath::RandRange(0, Rows.Num() - 1);
+		FBotInfoRow* RandomRow = Rows[RandomIndex];
+
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator, SpawnParams);
+		GetWorld()->SpawnActor<AActor>(RandomRow->BotData->BotClass, Locations[0], FRotator::ZeroRotator,
+		                               SpawnParams);
 
 		DrawDebugSphere(GetWorld(), Locations[0], 50.f, 20, FColor::Blue, false, 15.f);
 	}

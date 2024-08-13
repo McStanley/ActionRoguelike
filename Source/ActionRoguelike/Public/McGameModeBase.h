@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "McGameModeBase.generated.h"
 
+class UMcBotData;
 class UMcSaveGame;
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
@@ -14,6 +15,32 @@ namespace EEnvQueryStatus
 {
 	enum Type : int;
 }
+
+USTRUCT(BlueprintType)
+struct FBotInfoRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	FBotInfoRow()
+	{
+		BotData = nullptr;
+		Weight = 1.0f;
+		SpawnCost = 1;
+		KillReward = 1;
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UMcBotData* BotData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Weight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 SpawnCost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 KillReward;
+};
 
 /**
  * 
@@ -57,6 +84,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Level")
 	TSubclassOf<AActor> TeleportPickUpClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UDataTable* BotTypesTable;
+
 	FTimerHandle TimerHandle_SpawnBots;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
@@ -68,8 +98,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UCurveFloat* DifficultyCurve = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	TSubclassOf<AActor> MinionClass;
+	// UPROPERTY(EditDefaultsOnly, Category = "AI")
+	// TSubclassOf<AActor> MinionClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Credits")
 	int32 KillAwardCredits;
