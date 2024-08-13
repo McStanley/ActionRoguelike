@@ -24,6 +24,11 @@ void AMcRespawningPickUp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(AMcRespawningPickUp, bActive);
 }
 
+FText AMcRespawningPickUp::GetInteractMessage_Implementation(APawn* InstigatorPawn)
+{
+	return FText::GetEmpty();
+}
+
 void AMcRespawningPickUp::Deactivate()
 {
 	bActive = false;

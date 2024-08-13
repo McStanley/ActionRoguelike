@@ -6,10 +6,27 @@
 #include "McAttributeComponent.h"
 #include "McPlayerState.h"
 
+#define LOCTEXT_NAMESPACE "InteractableActors"
+
 AMcHealthPotion::AMcHealthPotion()
 {
 	RespawnDelay = 2.5f;
 	CreditsCost = 1;
+}
+
+FText AMcHealthPotion::GetInteractMessage_Implementation(APawn* InstigatorPawn)
+{
+	UMcAttributeComponent* AttributeComp = UMcAttributeComponent::GetAttributeComponent(InstigatorPawn);
+
+	if (AttributeComp && AttributeComp->HasFullHealth())
+	{
+		return LOCTEXT("HealthPotion_FullHealthWarning", "Already at full health.");
+	}
+
+	return FText::Format(
+		LOCTEXT("HealthPotion_InteractMessage", "Cost: {0} credits. Restores health to max."),
+		CreditsCost
+	);
 }
 
 void AMcHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
@@ -31,3 +48,5 @@ void AMcHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 		}
 	}
 }
+
+#undef LOCTEXT_NAMESPACE

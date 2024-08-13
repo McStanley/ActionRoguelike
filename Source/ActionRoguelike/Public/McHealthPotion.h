@@ -21,5 +21,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Credits")
 	int32 CreditsCost;
 
+	FText GetInteractMessage_Implementation(APawn* InstigatorPawn) override;
+
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 };

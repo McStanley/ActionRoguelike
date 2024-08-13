@@ -16,6 +16,8 @@ public:
 	// Sets default values for this actor's properties
 	AMcRespawningPickUp();
 
+	virtual FText GetInteractMessage_Implementation(APawn* InstigatorPawn);
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* MeshComp;
