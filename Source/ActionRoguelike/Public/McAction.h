@@ -53,11 +53,17 @@ public:
 	virtual bool IsSupportedForNetworking() const override;
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	UTexture2D* Icon;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTagContainer GrantsTags;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTagContainer BlockedTags;
+
+	UPROPERTY(Replicated)
+	float TimeStarted;
 
 	UPROPERTY(ReplicatedUsing="OnRep_RepData")
 	FActionRepData RepData;

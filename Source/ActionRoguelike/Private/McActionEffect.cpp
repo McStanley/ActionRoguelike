@@ -4,6 +4,7 @@
 #include "McActionEffect.h"
 
 #include "McActionComponent.h"
+#include "GameFramework/GameStateBase.h"
 
 UMcActionEffect::UMcActionEffect()
 {
@@ -48,6 +49,30 @@ void UMcActionEffect::StopAction_Implementation(AActor* Instigator)
 	{
 		ActionComp->RemoveAction(this);
 	}
+}
+
+float UMcActionEffect::GetTimeRemaining() const
+{
+	AGameStateBase* GS = GetWorld()->GetGameState();
+	if (GS)
+	{
+		const float CurrentTime = GS->GetServerWorldTimeSeconds();
+		const float EndTime = TimeStarted + Duration;
+
+		return EndTime - CurrentTime;
+	}
+
+	return Duration;
+}
+
+float UMcActionEffect::GetTimePercentRemaining() const
+{
+	if (Duration == 0)
+	{
+		return 0.f;
+	}
+
+	return GetTimeRemaining() / Duration;
 }
 
 void UMcActionEffect::ExecutePeriodicEffect_Implementation(AActor* Instigator)

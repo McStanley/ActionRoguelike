@@ -10,6 +10,9 @@
 
 class UMcAction;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActionStateChanged, UMcActionComponent*, OwningComp,
+                                             UMcAction*, Action);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ACTIONROGUELIKE_API UMcActionComponent : public UActorComponent
 {
@@ -36,11 +39,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
 	FGameplayTagContainer ActiveGameplayTags;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnActionStateChanged OnActionStarted;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnActionStateChanged OnActionStopped;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Actions")
 	TArray<TSubclassOf<UMcAction>> DefaultActions;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	TArray<TObjectPtr<UMcAction>> Actions;
 
 	UFUNCTION(Server, Reliable)
