@@ -4,12 +4,14 @@
 #include "McGameModeBase.h"
 
 #include "EngineUtils.h"
+#include "McActionComponent.h"
 #include "McAttributeComponent.h"
 #include "McBotData.h"
 #include "McCharacter.h"
 #include "McGameplayInterface.h"
 #include "McPlayerState.h"
 #include "McSaveGame.h"
+#include "ActionRoguelike/ActionRoguelike.h"
 #include "AI/McAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "GameFramework/GameStateBase.h"
@@ -200,8 +202,26 @@ void AMcGameModeBase::OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Que
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		GetWorld()->SpawnActor<AActor>(RandomRow->BotData->BotClass, Locations[0], FRotator::ZeroRotator,
-		                               SpawnParams);
+		AActor* NewBot = GetWorld()->SpawnActor<AActor>(RandomRow->BotData->BotClass, Locations[0],
+		                                                FRotator::ZeroRotator, SpawnParams);
+
+		if (NewBot)
+		{
+			LogOnScreen(
+				this, FString::Printf(TEXT("Spawned bot: %s (%s)"),
+				                      *GetNameSafe(NewBot),
+				                      *GetNameSafe(RandomRow->BotData)
+				));
+
+			UMcActionComponent* ActionComp = NewBot->GetComponentByClass<UMcActionComponent>();
+			if (ActionComp)
+			{
+				for (TSubclassOf<UMcAction> ActionClass : RandomRow->BotData->Actions)
+				{
+					ActionComp->AddAction(NewBot, ActionClass);
+				}
+			}
+		}
 
 		DrawDebugSphere(GetWorld(), Locations[0], 50.f, 20, FColor::Blue, false, 15.f);
 	}
