@@ -23,14 +23,13 @@ struct FBotInfoRow : public FTableRowBase
 
 	FBotInfoRow()
 	{
-		BotData = nullptr;
 		Weight = 1.0f;
 		SpawnCost = 1;
 		KillReward = 1;
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UMcBotData* BotData;
+	FPrimaryAssetId BotDataId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Weight;
@@ -112,6 +111,8 @@ protected:
 
 	UFUNCTION()
 	void OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+	void OnBotDataLoaded(FPrimaryAssetId LoadedId, FVector SpawnLocation);
 
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);

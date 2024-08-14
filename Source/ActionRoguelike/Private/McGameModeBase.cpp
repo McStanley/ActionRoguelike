@@ -13,6 +13,7 @@
 #include "McSaveGame.h"
 #include "ActionRoguelike/ActionRoguelike.h"
 #include "AI/McAICharacter.h"
+#include "Engine/AssetManager.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -199,32 +200,55 @@ void AMcGameModeBase::OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Que
 		int32 RandomIndex = FMath::RandRange(0, Rows.Num() - 1);
 		FBotInfoRow* RandomRow = Rows[RandomIndex];
 
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		AActor* NewBot = GetWorld()->SpawnActor<AActor>(RandomRow->BotData->BotClass, Locations[0],
-		                                                FRotator::ZeroRotator, SpawnParams);
-
-		if (NewBot)
+		if (UAssetManager* AssetManager = UAssetManager::GetIfInitialized())
 		{
-			LogOnScreen(
-				this, FString::Printf(TEXT("Spawned bot: %s (%s)"),
-				                      *GetNameSafe(NewBot),
-				                      *GetNameSafe(RandomRow->BotData)
-				));
+			LogOnScreen(this, "Loading bot...", FColor::Green);
 
-			UMcActionComponent* ActionComp = NewBot->GetComponentByClass<UMcActionComponent>();
-			if (ActionComp)
+			TArray<FName> Bundles;
+			FStreamableDelegate Delegate = FStreamableDelegate::CreateUObject(
+				this, &AMcGameModeBase::OnBotDataLoaded, RandomRow->BotDataId, Locations[0]
+			);
+
+			AssetManager->LoadPrimaryAsset(RandomRow->BotDataId, Bundles, Delegate);
+		}
+	}
+}
+
+void AMcGameModeBase::OnBotDataLoaded(FPrimaryAssetId LoadedId, FVector SpawnLocation)
+{
+	LogOnScreen(this, "Finished loading bot.", FColor::Green);
+
+	UAssetManager* AssetManager = UAssetManager::GetIfInitialized();
+	if (AssetManager == nullptr) return;
+
+	UMcBotData* BotData = AssetManager->GetPrimaryAssetObject<UMcBotData>(LoadedId);
+	if (BotData == nullptr) return;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AActor* NewBot = GetWorld()->SpawnActor<AActor>(BotData->BotClass, SpawnLocation,
+	                                                FRotator::ZeroRotator, SpawnParams);
+
+	if (NewBot)
+	{
+		LogOnScreen(
+			this, FString::Printf(TEXT("Spawned bot: %s (%s)"),
+			                      *GetNameSafe(NewBot),
+			                      *GetNameSafe(BotData)
+			));
+
+		UMcActionComponent* ActionComp = NewBot->GetComponentByClass<UMcActionComponent>();
+		if (ActionComp)
+		{
+			for (TSubclassOf<UMcAction> ActionClass : BotData->Actions)
 			{
-				for (TSubclassOf<UMcAction> ActionClass : RandomRow->BotData->Actions)
-				{
-					ActionComp->AddAction(NewBot, ActionClass);
-				}
+				ActionComp->AddAction(NewBot, ActionClass);
 			}
 		}
-
-		DrawDebugSphere(GetWorld(), Locations[0], 50.f, 20, FColor::Blue, false, 15.f);
 	}
+
+	DrawDebugSphere(GetWorld(), SpawnLocation, 50.f, 20, FColor::Blue, false, 15.f);
 }
 
 void AMcGameModeBase::OnActorKilled(AActor* VictimActor, AActor* KillerActor)

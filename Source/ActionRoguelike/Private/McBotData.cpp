@@ -2,3 +2,8 @@
 
 
 #include "McBotData.h"
+
+FPrimaryAssetId UMcBotData::GetPrimaryAssetId() const
+{
+	return FPrimaryAssetId("BotData", GetFName());
+}
