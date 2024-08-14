@@ -8,6 +8,8 @@
 #include "Engine/ActorChannel.h"
 #include "Net/UnrealNetwork.h"
 
+DECLARE_CYCLE_STAT(TEXT("StartActionByName"), STAT_StartActionByName, STATGROUP_McStanley);
+
 UMcActionComponent::UMcActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -110,6 +112,8 @@ bool UMcActionComponent::HasAction(TSubclassOf<UMcAction> ActionClass)
 
 bool UMcActionComponent::StartActionByName(AActor* Instigator, const FName ActionName)
 {
+	SCOPE_CYCLE_COUNTER(STAT_StartActionByName);
+
 	for (UMcAction* Action : Actions)
 	{
 		if (Action && Action->ActionName == ActionName)
