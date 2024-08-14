@@ -25,6 +25,8 @@ AMcMagicProjectile::AMcMagicProjectile()
 
 	MovementComp->InitialSpeed = 2000.f;
 
+	InitialLifeSpan = 10.f;
+
 	bParried = false;
 }
 
