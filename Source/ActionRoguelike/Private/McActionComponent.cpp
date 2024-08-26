@@ -37,6 +37,21 @@ void UMcActionComponent::BeginPlay()
 	}
 }
 
+void UMcActionComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	TArray<TObjectPtr<UMcAction>> ActionsCopy = Actions;
+
+	for (TObjectPtr<UMcAction> Action : ActionsCopy)
+	{
+		if (Action && Action->IsRunning())
+		{
+			Action->StopAction(GetOwner());
+		}
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
 
 void UMcActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                        FActorComponentTickFunction* ThisTickFunction)
@@ -127,6 +142,8 @@ bool UMcActionComponent::StartActionByName(AActor* Instigator, const FName Actio
 			{
 				ServerStartAction(Instigator, ActionName);
 			}
+
+			TRACE_BOOKMARK(TEXT("StartAction::%s"), *GetNameSafe(Action));
 
 			Action->StartAction(Instigator);
 			return true;
