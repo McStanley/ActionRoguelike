@@ -40,6 +40,12 @@ void AMcGameModeBase::InitGame(const FString& MapName, const FString& Options, F
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
+	FString SelectedSaveName = UGameplayStatics::ParseOption(Options, "SaveGame");
+	if (SelectedSaveName.Len() > 0)
+	{
+		SaveGameSlotName = SelectedSaveName;
+	}
+
 	LoadSaveGame();
 }
 
