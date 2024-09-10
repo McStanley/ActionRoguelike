@@ -15,10 +15,10 @@ struct FActionRepData
 	GENERATED_BODY()
 
 	UPROPERTY()
-	bool bIsRunning;
+	bool bIsRunning = false;
 
 	UPROPERTY()
-	AActor* Instigator;
+	AActor* Instigator = nullptr;
 };
 
 /**
