@@ -31,6 +31,8 @@ AMcCharacter::AMcCharacter()
 
 	TimeToHitParamName = "TimeToHit";
 
+	GetMesh()->SetGenerateOverlapEvents(true);
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
